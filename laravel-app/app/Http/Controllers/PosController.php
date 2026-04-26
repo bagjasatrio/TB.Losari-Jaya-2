@@ -7,6 +7,7 @@ use App\Models\InventoryCategory;
 use App\Models\InventoryUnit;
 use App\Models\Sale;
 use App\Models\Supplier;
+use App\Models\User;
 use App\Services\PosBootstrapService;
 use App\Services\PosDemoSeederService;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -16,6 +17,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
 class PosController extends Controller
@@ -39,6 +41,7 @@ class PosController extends Controller
                 'checkout' => route('pos.checkout'),
                 'reset' => route('pos.reset'),
                 'reportPdf' => route('pos.reports.pdf'),
+                'usersStore' => route('pos.users.store'),
             ],
         ]);
     }
@@ -48,20 +51,23 @@ class PosController extends Controller
         $credentials = $request->validate([
             'username' => ['required', 'string'],
             'password' => ['required', 'string'],
+        ], [
+            'username.required' => 'Username wajib diisi.',
+            'password.required' => 'Password wajib diisi.',
         ]);
 
-        if (! Auth::attempt($credentials, true)) {
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
+
             return response()->json([
-                'message' => 'Username atau password salah.',
-            ], 422);
+                'message' => 'Login berhasil.',
+                'state' => $bootstrapService->build($request->user()),
+            ]);
         }
 
-        $request->session()->regenerate();
-
         return response()->json([
-            'message' => 'Login berhasil.',
-            'state' => $bootstrapService->build($request->user()),
-        ]);
+            'message' => 'Username atau password tidak sesuai.',
+        ], 422);
     }
 
     public function logout(Request $request): JsonResponse
@@ -84,6 +90,8 @@ class PosController extends Controller
 
     public function storeItem(Request $request, PosBootstrapService $bootstrapService): JsonResponse
     {
+        $this->ensureAdmin($request);
+
         $data = $this->validateItemPayload($request);
         $supplier = $this->resolveSupplier($data['supplier']);
         $this->syncInventoryMasters($data['category'], $data['unit']);
@@ -108,6 +116,8 @@ class PosController extends Controller
 
     public function updateItem(Request $request, InventoryItem $item, PosBootstrapService $bootstrapService): JsonResponse
     {
+        $this->ensureAdmin($request);
+
         $data = $this->validateItemPayload($request, $item);
         $supplier = $this->resolveSupplier($data['supplier']);
         $this->syncInventoryMasters($data['category'], $data['unit']);
@@ -132,6 +142,8 @@ class PosController extends Controller
 
     public function destroyItem(Request $request, InventoryItem $item, PosBootstrapService $bootstrapService): JsonResponse
     {
+        $this->ensureAdmin($request);
+
         $item->delete();
 
         return response()->json([
@@ -142,6 +154,8 @@ class PosController extends Controller
 
     public function storeGoodsIn(Request $request, PosBootstrapService $bootstrapService): JsonResponse
     {
+        $this->ensureAdmin($request);
+
         $data = $request->validate([
             'date' => ['required', 'date'],
             'supplier' => ['required', 'string', 'max:255'],
@@ -246,6 +260,8 @@ class PosController extends Controller
 
     public function resetDemo(Request $request, PosDemoSeederService $seederService, PosBootstrapService $bootstrapService): JsonResponse
     {
+        $this->ensureAdmin($request);
+
         $admin = $seederService->resetAndSeed();
         Auth::login($admin);
         $request->session()->regenerate();
@@ -258,6 +274,8 @@ class PosController extends Controller
 
     public function storeSupplier(Request $request, PosBootstrapService $bootstrapService): JsonResponse
     {
+        $this->ensureAdmin($request);
+
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255', 'unique:suppliers,name'],
         ]);
@@ -274,6 +292,8 @@ class PosController extends Controller
 
     public function updateSupplier(Request $request, Supplier $supplier, PosBootstrapService $bootstrapService): JsonResponse
     {
+        $this->ensureAdmin($request);
+
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255', Rule::unique('suppliers', 'name')->ignore($supplier->id)],
         ]);
@@ -290,6 +310,8 @@ class PosController extends Controller
 
     public function destroySupplier(Request $request, Supplier $supplier, PosBootstrapService $bootstrapService): JsonResponse
     {
+        $this->ensureAdmin($request);
+
         if ($supplier->inventoryItems()->exists() || $supplier->goodsReceipts()->exists()) {
             return response()->json([
                 'message' => 'Supplier masih dipakai oleh barang atau transaksi restock.',
@@ -306,6 +328,8 @@ class PosController extends Controller
 
     public function storeCategory(Request $request, PosBootstrapService $bootstrapService): JsonResponse
     {
+        $this->ensureAdmin($request);
+
         $data = $this->validateMasterNamePayload($request, 'inventory_categories');
 
         InventoryCategory::query()->create([
@@ -320,6 +344,8 @@ class PosController extends Controller
 
     public function storeUnit(Request $request, PosBootstrapService $bootstrapService): JsonResponse
     {
+        $this->ensureAdmin($request);
+
         $data = $this->validateMasterNamePayload($request, 'inventory_units');
 
         InventoryUnit::query()->create([
@@ -332,8 +358,48 @@ class PosController extends Controller
         ]);
     }
 
+    public function storeUser(Request $request, PosBootstrapService $bootstrapService): JsonResponse
+    {
+        $this->ensureAdmin($request);
+
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'max:255', 'alpha_dash', 'unique:users,username'],
+            'email' => ['nullable', 'email', 'max:255', 'unique:users,email'],
+            'role' => ['required', Rule::in([User::ROLE_ADMIN, User::ROLE_CASHIER])],
+            'password' => ['required', 'string', 'min:6'],
+        ], [
+            'name.required' => 'Nama pengguna wajib diisi.',
+            'username.required' => 'Username wajib diisi.',
+            'username.alpha_dash' => 'Username hanya boleh berisi huruf, angka, strip, dan garis bawah.',
+            'username.unique' => 'Username sudah digunakan.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email sudah digunakan.',
+            'role.required' => 'Role pengguna wajib dipilih.',
+            'password.required' => 'Password wajib diisi.',
+            'password.min' => 'Password minimal 6 karakter.',
+        ]);
+
+        $username = strtolower(trim($data['username']));
+
+        User::query()->create([
+            'name' => trim($data['name']),
+            'username' => $username,
+            'role' => $data['role'],
+            'email' => ($data['email'] ?? null) ?: $username.'@tb-losari-jaya.local',
+            'password' => Hash::make($data['password']),
+        ]);
+
+        return response()->json([
+            'message' => 'User berhasil ditambahkan.',
+            'state' => $bootstrapService->build($request->user()),
+        ]);
+    }
+
     public function reportPdf(Request $request)
     {
+        $this->ensureAdmin($request);
+
         $payload = $this->buildReportPayload($request);
         $payload['logoDataUri'] = $this->reportLogoDataUri();
 
@@ -357,6 +423,15 @@ class PosController extends Controller
             'price' => ['required', 'integer', 'min:0'],
             'description' => ['nullable', 'string'],
         ]);
+    }
+
+    private function ensureAdmin(Request $request): void
+    {
+        if (! $request->user()?->isAdmin()) {
+            abort(response()->json([
+                'message' => 'Akses hanya tersedia untuk akun admin.',
+            ], 403));
+        }
     }
 
     private function validateMasterNamePayload(Request $request, string $table): array

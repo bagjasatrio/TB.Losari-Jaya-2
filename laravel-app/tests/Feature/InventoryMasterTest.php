@@ -20,6 +20,7 @@ class InventoryMasterTest extends TestCase
         $user = User::query()->create([
             'name' => 'Admin Test',
             'username' => 'admin-test',
+            'role' => User::ROLE_ADMIN,
             'email' => 'admin-test@example.test',
             'password' => Hash::make('password'),
         ]);
@@ -48,6 +49,7 @@ class InventoryMasterTest extends TestCase
         $user = User::query()->create([
             'name' => 'Admin Test',
             'username' => 'admin-pdf',
+            'role' => User::ROLE_ADMIN,
             'email' => 'admin-pdf@example.test',
             'password' => Hash::make('password'),
         ]);
@@ -103,5 +105,51 @@ class InventoryMasterTest extends TestCase
             ]))
             ->assertOk()
             ->assertHeader('content-type', 'application/pdf');
+    }
+
+    public function test_login_accepts_username_and_returns_role_state(): void
+    {
+        User::query()->create([
+            'name' => 'Kasir Test',
+            'username' => 'kasir-test',
+            'role' => User::ROLE_CASHIER,
+            'email' => 'kasir-test@example.test',
+            'password' => Hash::make('password'),
+        ]);
+
+        $this->postJson(route('pos.login'), [
+            'username' => 'kasir-test',
+            'password' => 'password',
+        ])
+            ->assertOk()
+            ->assertJsonPath('state.auth.role', User::ROLE_CASHIER)
+            ->assertJsonPath('state.auth.roleLabel', 'Kasir');
+    }
+
+    public function test_admin_can_add_cashier_and_cashier_cannot_manage_admin_data(): void
+    {
+        $admin = User::query()->create([
+            'name' => 'Admin User',
+            'username' => 'admin-user',
+            'role' => User::ROLE_ADMIN,
+            'email' => 'admin-user@example.test',
+            'password' => Hash::make('password'),
+        ]);
+
+        $this->actingAs($admin)
+            ->postJson(route('pos.users.store'), [
+                'name' => 'Kasir Baru',
+                'username' => 'kasir-baru',
+                'role' => User::ROLE_CASHIER,
+                'password' => 'secret123',
+            ])
+            ->assertOk()
+            ->assertJsonFragment(['username' => 'kasir-baru']);
+
+        $cashier = User::query()->where('username', 'kasir-baru')->firstOrFail();
+
+        $this->actingAs($cashier)
+            ->postJson(route('pos.categories.store'), ['name' => 'Admin Only'])
+            ->assertForbidden();
     }
 }

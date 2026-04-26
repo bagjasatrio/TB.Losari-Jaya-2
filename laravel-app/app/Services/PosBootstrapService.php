@@ -30,7 +30,18 @@ class PosBootstrapService
             'auth' => [
                 'isLoggedIn' => $user !== null,
                 'userName' => $user?->name ?? '',
+                'role' => $user?->role ?: User::ROLE_ADMIN,
+                'roleLabel' => $user?->role === User::ROLE_CASHIER ? 'Kasir' : 'Admin',
+                'canManage' => $user?->isAdmin() ?? false,
             ],
+            'users' => $user?->isAdmin()
+                ? User::query()
+                    ->orderBy('name')
+                    ->get()
+                    ->map(fn (User $account) => $this->serializeUser($account))
+                    ->values()
+                    ->all()
+                : [],
             'inventory' => $inventoryItems
                 ->map(fn (InventoryItem $item) => $this->serializeInventoryItem($item))
                 ->values()
@@ -75,6 +86,18 @@ class PosBootstrapService
             'id' => $master->id,
             'name' => $master->name,
             'itemsCount' => (int) ($usage[$master->name] ?? 0),
+        ];
+    }
+
+    private function serializeUser(User $user): array
+    {
+        return [
+            'id' => $user->id,
+            'name' => $user->name,
+            'username' => $user->username,
+            'email' => $user->email,
+            'role' => $user->role,
+            'roleLabel' => $user->role === User::ROLE_CASHIER ? 'Kasir' : 'Admin',
         ];
     }
 

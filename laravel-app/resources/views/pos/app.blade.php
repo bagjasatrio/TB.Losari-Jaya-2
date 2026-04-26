@@ -79,19 +79,14 @@
     <div class="login-panel surface-panel">
       <div class="login-panel-head">
         <img src="{{ asset('pos/logolj2.png') }}" alt="Logo TB. Losari Jaya 2" class="login-panel-brand">
-        <p class="eyebrow">Masuk Demo</p>
-        <p>Gunakan akun demo untuk membuka website implementasi proposal.</p>
-      </div>
-
-      <div class="demo-chip-row">
-        <span class="chip chip-soft">Username: <strong>admin</strong></span>
-        <span class="chip chip-soft">Password: <strong>losari123</strong></span>
+        <p class="eyebrow">Masuk Sistem</p>
+        <p>Masukkan username dan password sesuai akun yang sudah dibuat admin.</p>
       </div>
 
       <form id="loginForm" class="form-stack">
         <label class="field">
           <span>Username</span>
-          <input id="loginUsername" name="username" type="text" value="admin" autocomplete="username" required>
+          <input id="loginUsername" name="username" type="text" autocomplete="username" required>
         </label>
 
         <label class="field">
@@ -100,7 +95,6 @@
             id="loginPassword"
             name="password"
             type="password"
-            value="losari123"
             autocomplete="current-password"
             required
           >
@@ -147,6 +141,10 @@
           <span class="material-symbols-outlined">assessment</span>
           <span>Laporan</span>
         </button>
+        <button class="nav-item" data-nav="users">
+          <span class="material-symbols-outlined">group_add</span>
+          <span>Pengguna</span>
+        </button>
       </nav>
 
       <div class="sidebar-foot">
@@ -188,7 +186,7 @@
             </div>
             <div class="meta-pill meta-pill-accent">
               <span class="material-symbols-outlined">verified_user</span>
-              <span>Admin</span>
+              <span id="headerRoleLabel">Admin</span>
             </div>
           </div>
         </div>
@@ -674,6 +672,84 @@
               </table>
             </div>
           </article>
+        </section>
+
+        <section class="page" data-view="users">
+          <div class="page-head">
+            <div>
+              <p class="eyebrow">Manajemen Pengguna</p>
+              <h3>Tambah akun admin dan kasir.</h3>
+              <p>Admin dapat membuat akun baru. Akun kasir diarahkan ke halaman transaksi kasir.</p>
+            </div>
+          </div>
+
+          <div class="split-grid">
+            <article class="surface-panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">Form User</p>
+                  <h4>Tambah pengguna sistem</h4>
+                </div>
+              </div>
+
+              <form id="userForm" class="form-grid">
+                <label class="field">
+                  <span>Nama</span>
+                  <input id="userName" name="name" type="text" placeholder="Contoh: Kasir Pagi" required>
+                </label>
+
+                <label class="field">
+                  <span>Username</span>
+                  <input id="userUsername" name="username" type="text" placeholder="kasir_pagi" autocomplete="off" required>
+                </label>
+
+                <label class="field">
+                  <span>Role</span>
+                  <select id="userRole" name="role" required>
+                    <option value="cashier">Kasir</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </label>
+
+                <label class="field">
+                  <span>Password</span>
+                  <input id="userPassword" name="password" type="password" placeholder="Minimal 6 karakter" autocomplete="new-password" required>
+                </label>
+
+                <label class="field field-full">
+                  <span>Email Opsional</span>
+                  <input id="userEmail" name="email" type="email" placeholder="contoh@domain.com">
+                </label>
+
+                <button class="button button-primary field-full" type="submit">
+                  <span class="material-symbols-outlined">person_add</span>
+                  Simpan User
+                </button>
+              </form>
+            </article>
+
+            <article class="surface-panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">Daftar User</p>
+                  <h4 id="userSummaryCount">0 pengguna aktif</h4>
+                </div>
+              </div>
+
+              <div class="table-shell">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Nama</th>
+                      <th>Username</th>
+                      <th>Role</th>
+                    </tr>
+                  </thead>
+                  <tbody id="userTableBody"></tbody>
+                </table>
+              </div>
+            </article>
+          </div>
         </section>
 
         <section class="page" data-view="reports">

@@ -20,5 +20,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/goods-in', [PosController::class, 'storeGoodsIn'])->name('pos.goods-in.store');
     Route::post('/checkout', [PosController::class, 'checkout'])->name('pos.checkout');
     Route::post('/reset-demo', [PosController::class, 'resetDemo'])->name('pos.reset');
+    Route::post('/users', [PosController::class, 'storeUser'])->name('pos.users.store');
     Route::get('/reports/pdf', [PosController::class, 'reportPdf'])->name('pos.reports.pdf');
 });

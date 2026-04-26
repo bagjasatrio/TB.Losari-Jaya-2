@@ -31,6 +31,9 @@ let state;
 let els;
 let activeSaleId = null;
 
+const ADMIN_VIEWS = ["dashboard", "inventory", "cashier", "finance", "reports", "users"];
+const CASHIER_VIEWS = ["cashier"];
+
 document.addEventListener("DOMContentLoaded", () => {
   state = createEmptyState();
   cacheElements();
@@ -47,13 +50,17 @@ function createEmptyState() {
     categories: [],
     units: [],
     suppliers: [],
+    users: [],
     goodsIn: [],
     sales: [],
     cart: [],
     lastReceipt: null,
     auth: {
       isLoggedIn: false,
-      userName: ""
+      userName: "",
+      role: "",
+      roleLabel: "",
+      canManage: false
     },
     ui: {
       activeView: "dashboard",
@@ -82,6 +89,7 @@ function setBootState(bootState, options = {}) {
     categories: Array.isArray(bootState?.categories) ? bootState.categories : empty.categories,
     units: Array.isArray(bootState?.units) ? bootState.units : empty.units,
     suppliers: Array.isArray(bootState?.suppliers) ? bootState.suppliers : empty.suppliers,
+    users: Array.isArray(bootState?.users) ? bootState.users : empty.users,
     goodsIn: Array.isArray(bootState?.goodsIn) ? bootState.goodsIn : empty.goodsIn,
     sales: Array.isArray(bootState?.sales) ? bootState.sales : empty.sales,
     cart: [],
@@ -112,6 +120,11 @@ function setBootState(bootState, options = {}) {
     };
   }
 
+  const allowedViews = getAllowedViews(next.auth);
+  if (!allowedViews.includes(next.ui.activeView)) {
+    next.ui.activeView = allowedViews[0] || "cashier";
+  }
+
   state = next;
 }
 
@@ -135,7 +148,10 @@ async function apiRequest(url, options = {}) {
   }
 
   if (!response.ok) {
-    const message = payload?.message || "Terjadi kesalahan saat memproses permintaan.";
+    const validationMessage = payload?.errors
+      ? Object.values(payload.errors).flat().find(Boolean)
+      : null;
+    const message = translateApiMessage(validationMessage || payload?.message || "Terjadi kesalahan saat memproses permintaan.");
     throw new Error(message);
   }
 
@@ -161,6 +177,7 @@ function cacheElements() {
     headerTitle: document.getElementById("headerTitle"),
     headerSubtitle: document.getElementById("headerSubtitle"),
     headerDate: document.getElementById("headerDate"),
+    headerRoleLabel: document.getElementById("headerRoleLabel"),
     globalSearch: document.getElementById("globalSearch"),
     dashboardExportBtn: document.getElementById("dashboardExportBtn"),
     restockShortcutBtn: document.getElementById("restockShortcutBtn"),
@@ -249,6 +266,14 @@ function cacheElements() {
     financeProfitHint: document.getElementById("financeProfitHint"),
     financeMarginHint: document.getElementById("financeMarginHint"),
     financeLedgerBody: document.getElementById("financeLedgerBody"),
+    userForm: document.getElementById("userForm"),
+    userName: document.getElementById("userName"),
+    userUsername: document.getElementById("userUsername"),
+    userRole: document.getElementById("userRole"),
+    userPassword: document.getElementById("userPassword"),
+    userEmail: document.getElementById("userEmail"),
+    userSummaryCount: document.getElementById("userSummaryCount"),
+    userTableBody: document.getElementById("userTableBody"),
     itemModal: document.getElementById("itemModal"),
     itemModalBackdrop: document.getElementById("itemModalBackdrop"),
     closeItemModalBtn: document.getElementById("closeItemModalBtn"),
@@ -374,6 +399,7 @@ function bindEvents() {
   els.exportCsvBtn.addEventListener("click", exportCurrentReportCsv);
   els.printReportBtn.addEventListener("click", printCurrentReport);
   els.reportTableBody.addEventListener("click", handleReportTableClick);
+  els.userForm.addEventListener("submit", handleUserSubmit);
 
   els.closeItemModalBtn.addEventListener("click", closeItemModal);
   els.cancelItemModalBtn.addEventListener("click", closeItemModal);
@@ -545,13 +571,17 @@ function createSeedState() {
   return {
     version: "legacy-demo-state",
     inventory,
+    users: [],
     goodsIn,
     sales,
     cart: [],
     lastReceipt: sales[0] || null,
     auth: {
       isLoggedIn: false,
-      userName: "Admin Losari"
+      userName: "Admin Losari",
+      role: "admin",
+      roleLabel: "Admin",
+      canManage: true
     },
     ui: {
       activeView: "dashboard",
@@ -612,6 +642,7 @@ function renderAll() {
   renderCashier();
   renderReports();
   renderFinance();
+  renderUsers();
   updateReportControls();
   updateInventoryMode();
 }
@@ -622,14 +653,25 @@ function syncAuthView() {
 }
 
 function updateSidebarAndPage() {
+  const allowedViews = getAllowedViews();
+  if (!allowedViews.includes(state.ui.activeView)) {
+    state.ui.activeView = allowedViews[0] || "cashier";
+  }
+
   els.navItems.forEach((item) => {
+    const allowed = allowedViews.includes(item.dataset.nav);
+    item.classList.toggle("hidden", !allowed);
     item.classList.toggle("active", item.dataset.nav === state.ui.activeView);
   });
 
   els.pages.forEach((page) => {
-    page.classList.toggle("active", page.dataset.view === state.ui.activeView);
+    const allowed = allowedViews.includes(page.dataset.view);
+    page.classList.toggle("hidden", !allowed);
+    page.classList.toggle("active", allowed && page.dataset.view === state.ui.activeView);
   });
 
+  els.resetDemoBtn.classList.toggle("hidden", !isAdmin());
+  els.globalSearch.closest(".search-field")?.classList.toggle("hidden", isCashier());
   els.appView.classList.toggle("sidebar-open", state.ui.isSidebarOpen);
 }
 
@@ -659,13 +701,23 @@ function updateHeader() {
       eyebrow: "Keuangan",
       title: "Keuangan Toko",
       subtitle: "Pantau pendapatan, pengeluaran, keuntungan, dan margin toko."
+    },
+    users: {
+      eyebrow: "Akun",
+      title: "Manajemen Pengguna",
+      subtitle: "Tambah akun admin dan kasir sesuai kebutuhan operasional."
     }
-  }[state.ui.activeView];
+  }[state.ui.activeView] || {
+    eyebrow: "Kasir",
+    title: "Transaksi Penjualan",
+    subtitle: "Pilih barang, proses pembayaran, dan cetak nota."
+  };
 
   els.headerEyebrow.textContent = copy.eyebrow;
   els.headerTitle.textContent = copy.title;
   els.headerSubtitle.textContent = copy.subtitle;
   els.headerDate.textContent = formatLongDate(new Date());
+  els.headerRoleLabel.textContent = state.auth.roleLabel || (isCashier() ? "Kasir" : "Admin");
 }
 
 function syncSearchInputs() {
@@ -1122,6 +1174,35 @@ function renderFinance() {
     `;
 }
 
+function renderUsers() {
+  if (!els.userTableBody || !isAdmin()) {
+    return;
+  }
+
+  const users = Array.isArray(state.users) ? state.users : [];
+  els.userSummaryCount.textContent = `${formatNumber(users.length)} pengguna aktif`;
+  els.userTableBody.innerHTML = users.length
+    ? users
+      .map((user) => `
+        <tr>
+          <td>
+            <div class="name-cell">
+              <strong>${escapeHtml(user.name)}</strong>
+              <small>${escapeHtml(user.email || "-")}</small>
+            </div>
+          </td>
+          <td>${escapeHtml(user.username)}</td>
+          <td><span class="role-badge ${user.role === "cashier" ? "cashier" : "admin"}">${escapeHtml(user.roleLabel || formatRoleLabel(user.role))}</span></td>
+        </tr>
+      `)
+      .join("")
+    : `
+      <tr>
+        <td colspan="3">${renderEmptyState("Belum ada data pengguna.")}</td>
+      </tr>
+    `;
+}
+
 function updateInventoryMode() {
   const mode = state.ui.inventoryMode;
   els.inventoryCatalogPanel.classList.toggle("hidden", mode !== "catalog");
@@ -1338,6 +1419,42 @@ async function handleUnitMasterSubmit(event) {
   }
 }
 
+async function handleUserSubmit(event) {
+  event.preventDefault();
+
+  const payload = {
+    name: els.userName.value.trim(),
+    username: els.userUsername.value.trim().toLowerCase(),
+    role: els.userRole.value,
+    password: els.userPassword.value,
+    email: els.userEmail.value.trim()
+  };
+
+  if (!payload.name || !payload.username || !payload.role || !payload.password) {
+    showToast("danger", "Data user belum lengkap", "Isi nama, username, role, dan password terlebih dahulu.");
+    return;
+  }
+
+  if (payload.password.length < 6) {
+    showToast("danger", "Password terlalu pendek", "Password minimal 6 karakter.");
+    return;
+  }
+
+  try {
+    const response = await apiRequest(POS_ROUTES.usersStore, {
+      method: "POST",
+      body: payload
+    });
+    setBootState(response.state);
+    els.userForm.reset();
+    els.userRole.value = "cashier";
+    renderAll();
+    showToast("success", "User ditambahkan", response.message || `${payload.name} berhasil dibuat.`);
+  } catch (error) {
+    showToast("danger", "Gagal menambah user", error.message);
+  }
+}
+
 async function handleLogin(event) {
   event.preventDefault();
   const username = els.loginUsername.value.trim();
@@ -1401,6 +1518,11 @@ async function resetDemo() {
 }
 
 function showView(view) {
+  if (!getAllowedViews().includes(view)) {
+    showToast("danger", "Akses dibatasi", "Menu ini hanya tersedia untuk akun admin.");
+    return;
+  }
+
   state.ui.activeView = view;
   state.ui.isSidebarOpen = false;
   renderAll();
@@ -2569,6 +2691,34 @@ function supportsDecimalQuantity(item) {
   const unit = String(item?.unit || "").toLowerCase();
   const decimalUnits = ["kg", "kilo", "gram", "gr", "liter", "ltr", "meter"];
   return decimalUnits.some((current) => unit.includes(current)) || !Number.isInteger(normalizeQuantity(item?.stock));
+}
+
+function isAdmin(auth = state?.auth) {
+  return auth?.canManage === true || auth?.role === "admin";
+}
+
+function isCashier(auth = state?.auth) {
+  return auth?.role === "cashier";
+}
+
+function getAllowedViews(auth = state?.auth) {
+  return isAdmin(auth) ? ADMIN_VIEWS : CASHIER_VIEWS;
+}
+
+function formatRoleLabel(role) {
+  return role === "cashier" ? "Kasir" : "Admin";
+}
+
+function translateApiMessage(message) {
+  const text = String(message || "");
+  const map = {
+    "validation.required": "Data wajib diisi.",
+    "validation.email": "Format email tidak valid.",
+    "validation.unique": "Data sudah digunakan.",
+    "validation.min.string": "Nilai yang diisi terlalu pendek."
+  };
+
+  return map[text] || text;
 }
 
 function renderEmptyState(message) {

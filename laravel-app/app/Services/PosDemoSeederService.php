@@ -30,8 +30,19 @@ class PosDemoSeederService
             ['username' => 'admin'],
             [
                 'name' => 'Admin Losari',
+                'role' => User::ROLE_ADMIN,
                 'email' => 'admin@losari-jaya.local',
                 'password' => Hash::make('losari123'),
+            ],
+        );
+
+        User::query()->updateOrCreate(
+            ['username' => 'kasir'],
+            [
+                'name' => 'Kasir Losari',
+                'role' => User::ROLE_CASHIER,
+                'email' => 'kasir@losari-jaya.local',
+                'password' => Hash::make('kasir123'),
             ],
         );
 
