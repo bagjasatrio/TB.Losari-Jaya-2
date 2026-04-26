@@ -139,6 +139,10 @@
           <span class="material-symbols-outlined">point_of_sale</span>
           <span>Transaksi/Kasir</span>
         </button>
+        <button class="nav-item" data-nav="finance">
+          <span class="material-symbols-outlined">account_balance_wallet</span>
+          <span>Keuangan</span>
+        </button>
         <button class="nav-item" data-nav="reports">
           <span class="material-symbols-outlined">assessment</span>
           <span>Laporan</span>
@@ -591,6 +595,87 @@
           </div>
         </section>
 
+        <section class="page" data-view="finance">
+          <div class="page-head">
+            <div>
+              <p class="eyebrow">Keuangan Toko</p>
+              <h3>Keuntungan, margin, pendapatan, dan pengeluaran.</h3>
+              <p>Ringkasan ini menggabungkan transaksi kasir sebagai pendapatan dan barang masuk sebagai pengeluaran toko.</p>
+            </div>
+          </div>
+
+          <div class="metric-grid report-metrics">
+            <article class="metric-card metric-card-large">
+              <div class="metric-icon metric-primary">
+                <span class="material-symbols-outlined">payments</span>
+              </div>
+              <div class="metric-copy">
+                <span>Total Pendapatan</span>
+                <strong id="financeRevenue">Rp 0</strong>
+                <small id="financeIncomeHint">0 transaksi penjualan tercatat</small>
+              </div>
+            </article>
+
+            <article class="metric-card">
+              <div class="metric-icon metric-danger">
+                <span class="material-symbols-outlined">shopping_cart</span>
+              </div>
+              <div class="metric-copy">
+                <span>Total Pengeluaran</span>
+                <strong id="financeExpense">Rp 0</strong>
+                <small id="financeExpenseHint">0 transaksi barang masuk tercatat</small>
+              </div>
+            </article>
+
+            <article class="metric-card">
+              <div class="metric-icon metric-secondary">
+                <span class="material-symbols-outlined">trending_up</span>
+              </div>
+              <div class="metric-copy">
+                <span>Keuntungan</span>
+                <strong id="financeProfit">Rp 0</strong>
+                <small id="financeProfitHint">Pendapatan dikurangi pengeluaran</small>
+              </div>
+            </article>
+
+            <article class="metric-card">
+              <div class="metric-icon metric-neutral">
+                <span class="material-symbols-outlined">percent</span>
+              </div>
+              <div class="metric-copy">
+                <span>Margin</span>
+                <strong id="financeMargin">0%</strong>
+                <small id="financeMarginHint">Keuntungan terhadap pendapatan</small>
+              </div>
+            </article>
+          </div>
+
+          <article class="surface-panel">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Data Lengkap</p>
+                <h4>Arus keuangan toko</h4>
+              </div>
+            </div>
+
+            <div class="table-shell">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Tanggal</th>
+                    <th>Tipe</th>
+                    <th>Keterangan</th>
+                    <th class="align-right">Pendapatan</th>
+                    <th class="align-right">Pengeluaran</th>
+                    <th class="align-right">Saldo</th>
+                  </tr>
+                </thead>
+                <tbody id="financeLedgerBody"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
         <section class="page" data-view="reports">
           <div class="page-head">
             <div>
@@ -791,6 +876,45 @@
           </button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <div id="transactionModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="transactionModalTitle">
+    <div id="transactionModalBackdrop" class="modal-backdrop"></div>
+    <div class="modal-card surface-panel transaction-modal-card">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">Detail Transaksi</p>
+          <h4 id="transactionModalTitle">No Transaksi</h4>
+          <small id="transactionModalMeta">Tanggal transaksi</small>
+        </div>
+        <button id="closeTransactionModalBtn" class="icon-button" type="button" aria-label="Tutup detail transaksi">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <div id="transactionDetailSummary" class="transaction-summary-grid"></div>
+
+      <div class="table-shell">
+        <table class="data-table detail-table">
+          <thead>
+            <tr>
+              <th>Barang</th>
+              <th class="align-right">Jumlah</th>
+              <th class="align-right">Harga</th>
+              <th class="align-right">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody id="transactionDetailItems"></tbody>
+        </table>
+      </div>
+
+      <div class="modal-actions">
+        <button id="printTransactionModalBtn" class="button button-primary" type="button">
+          <span class="material-symbols-outlined">receipt_long</span>
+          Cetak Ulang Struk
+        </button>
+      </div>
     </div>
   </div>
 

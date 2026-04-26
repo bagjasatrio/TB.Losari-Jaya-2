@@ -335,6 +335,7 @@ class PosController extends Controller
     public function reportPdf(Request $request)
     {
         $payload = $this->buildReportPayload($request);
+        $payload['logoDataUri'] = $this->reportLogoDataUri();
 
         $pdf = Pdf::loadView('pos.report-pdf', [
             'report' => $payload,
@@ -408,16 +409,16 @@ class PosController extends Controller
 
     private function buildSalesReportPayload(Request $request, string $period): array
     {
-        $sales = Sale::query()
-            ->with('items')
-            ->latest('sold_at')
-            ->get();
-
         if ($period === 'daily') {
-            $selectedDate = Carbon::parse($request->string('date', now()->toDateString())->toString());
-            $rows = $sales
-                ->filter(fn (Sale $sale) => $sale->sold_at?->toDateString() === $selectedDate->toDateString())
-                ->values();
+            $selectedDate = Carbon::parse($request->string('date', now()->toDateString())->toString(), config('app.timezone'));
+            $rows = Sale::query()
+                ->with('items')
+                ->whereBetween('sold_at', [
+                    $selectedDate->copy()->startOfDay(),
+                    $selectedDate->copy()->endOfDay(),
+                ])
+                ->latest('sold_at')
+                ->get();
 
             $summaryRevenue = $rows->sum('total');
             $summaryTransactions = $rows->count();
@@ -441,6 +442,11 @@ class PosController extends Controller
                 ],
             ];
         }
+
+        $sales = Sale::query()
+            ->with('items')
+            ->latest('sold_at')
+            ->get();
 
         if ($period === 'yearly') {
             $selectedYear = (int) $request->string('year', (string) now()->year)->toString();
@@ -567,5 +573,16 @@ class PosController extends Controller
         $number = (float) $value;
 
         return rtrim(rtrim(number_format($number, 3, ',', '.'), '0'), ',');
+    }
+
+    private function reportLogoDataUri(): ?string
+    {
+        $path = public_path('pos/logolj2-pdf.jpg');
+
+        if (! file_exists($path)) {
+            return null;
+        }
+
+        return 'data:image/jpeg;base64,'.base64_encode((string) file_get_contents($path));
     }
 }

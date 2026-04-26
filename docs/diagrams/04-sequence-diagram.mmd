@@ -1,0 +1,32 @@
+﻿sequenceDiagram
+    actor Kasir
+    participant UI as Frontend POS
+    participant Controller as PosController
+    participant DB as MySQL Database
+    participant Item as InventoryItem
+    participant Sale as Sale
+    participant SaleItem as SaleItem
+    participant Bootstrap as PosBootstrapService
+
+    Kasir->>UI: Pilih barang dan jumlah
+    UI->>UI: Hitung subtotal, diskon, total, kembalian
+    Kasir->>UI: Klik Bayar
+    UI->>Controller: POST /checkout
+    Controller->>Controller: Validasi item, jumlah, diskon, pembayaran
+    Controller->>DB: Mulai transaksi database
+    Controller->>Item: Lock dan ambil barang
+    Item->>DB: SELECT inventory_items FOR UPDATE
+    Controller->>Controller: Cek stok mencukupi
+    Controller->>Item: Kurangi stok
+    Item->>DB: UPDATE inventory_items
+    Controller->>Sale: Buat transaksi penjualan
+    Sale->>DB: INSERT sales
+    Controller->>SaleItem: Simpan rincian item penjualan
+    SaleItem->>DB: INSERT sale_items
+    Controller->>DB: Commit transaksi database
+    Controller->>Bootstrap: Build state terbaru
+    Bootstrap->>DB: Ambil inventory, suppliers, goods_receipts, sales
+    Bootstrap-->>Controller: State terbaru
+    Controller-->>UI: Response sukses dan state terbaru
+    UI->>Kasir: Tampilkan notifikasi transaksi berhasil
+    Kasir->>UI: Cetak struk

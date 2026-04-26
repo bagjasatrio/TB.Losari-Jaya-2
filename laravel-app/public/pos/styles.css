@@ -1015,6 +1015,13 @@ img {
   flex-wrap: wrap;
 }
 
+.activity-actions {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  margin-top: 0.25rem;
+}
+
 .segmented {
   display: inline-grid;
   grid-auto-flow: column;
@@ -1199,6 +1206,11 @@ img {
   justify-content: flex-end;
   gap: 0.45rem;
   flex-wrap: wrap;
+}
+
+.table-actions-start {
+  justify-content: flex-start;
+  margin-top: 0.55rem;
 }
 
 .mini-button {
@@ -1502,6 +1514,45 @@ img {
   width: min(520px, 100%);
 }
 
+.transaction-modal-card {
+  width: min(920px, 100%);
+}
+
+.transaction-modal-card .panel-head small {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--surface-muted);
+  font-weight: 700;
+}
+
+.transaction-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.transaction-summary-grid div {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.85rem;
+  border-radius: 20px;
+  background: rgba(243, 244, 245, 0.86);
+}
+
+.transaction-summary-grid span {
+  color: var(--surface-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.transaction-summary-grid strong {
+  font-size: 1rem;
+  letter-spacing: -0.03em;
+}
+
 .sidebar-overlay {
   display: none;
 }
@@ -1664,6 +1715,7 @@ img {
   .metric-grid,
   .form-grid,
   .master-entry-form,
+  .transaction-summary-grid,
   .cart-actions {
     grid-template-columns: 1fr;
   }

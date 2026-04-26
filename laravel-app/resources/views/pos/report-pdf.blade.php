@@ -6,9 +6,9 @@
     <style>
         body { font-family: DejaVu Sans, sans-serif; margin: 24px; color: #191c1d; font-size: 12px; }
         .report-brand { margin-bottom: 18px; color: #003f87; }
-        .report-logo-mark { display: inline-block; width: 34px; height: 34px; border: 4px solid #003f87; border-radius: 8px; vertical-align: middle; }
-        .report-brand-name { display: inline-block; margin-left: 10px; font-size: 20px; font-weight: bold; letter-spacing: .04em; vertical-align: middle; }
-        .report-brand-tagline { margin-top: 4px; margin-left: 54px; font-size: 10px; text-transform: uppercase; letter-spacing: .14em; color: #466270; }
+        .report-logo { width: 150px; height: auto; margin-bottom: 6px; }
+        .report-brand-name { font-size: 20px; font-weight: bold; letter-spacing: .04em; }
+        .report-brand-tagline { margin-top: 4px; font-size: 10px; text-transform: uppercase; letter-spacing: .14em; color: #466270; }
         h1 { margin: 0; font-size: 24px; }
         p { margin: 4px 0; color: #4b5563; }
         .metrics { width: 100%; margin: 24px 0 18px; }
@@ -23,8 +23,10 @@
 </head>
 <body>
     <div class="report-brand">
-        <span class="report-logo-mark"></span>
-        <span class="report-brand-name">TB. LOSARI JAYA 2</span>
+        @if (! empty($report['logoDataUri']))
+            <img class="report-logo" src="{{ $report['logoDataUri'] }}" alt="Logo TB. Losari Jaya 2">
+        @endif
+        <div class="report-brand-name">TB. LOSARI JAYA 2</div>
         <div class="report-brand-tagline">Industrial Atelier POS</div>
     </div>
     <h1>{{ $report['title'] }}</h1>

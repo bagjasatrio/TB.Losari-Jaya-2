@@ -29,6 +29,7 @@ const DEFAULT_UNIT_OPTIONS = [
 
 let state;
 let els;
+let activeSaleId = null;
 
 document.addEventListener("DOMContentLoaded", () => {
   state = createEmptyState();
@@ -239,6 +240,15 @@ function cacheElements() {
     reportTableTitle: document.getElementById("reportTableTitle"),
     reportTableHead: document.getElementById("reportTableHead"),
     reportTableBody: document.getElementById("reportTableBody"),
+    financeRevenue: document.getElementById("financeRevenue"),
+    financeExpense: document.getElementById("financeExpense"),
+    financeProfit: document.getElementById("financeProfit"),
+    financeMargin: document.getElementById("financeMargin"),
+    financeIncomeHint: document.getElementById("financeIncomeHint"),
+    financeExpenseHint: document.getElementById("financeExpenseHint"),
+    financeProfitHint: document.getElementById("financeProfitHint"),
+    financeMarginHint: document.getElementById("financeMarginHint"),
+    financeLedgerBody: document.getElementById("financeLedgerBody"),
     itemModal: document.getElementById("itemModal"),
     itemModalBackdrop: document.getElementById("itemModalBackdrop"),
     closeItemModalBtn: document.getElementById("closeItemModalBtn"),
@@ -262,7 +272,15 @@ function cacheElements() {
     supplierModalTitle: document.getElementById("supplierModalTitle"),
     supplierForm: document.getElementById("supplierForm"),
     supplierId: document.getElementById("supplierId"),
-    supplierName: document.getElementById("supplierName")
+    supplierName: document.getElementById("supplierName"),
+    transactionModal: document.getElementById("transactionModal"),
+    transactionModalBackdrop: document.getElementById("transactionModalBackdrop"),
+    closeTransactionModalBtn: document.getElementById("closeTransactionModalBtn"),
+    printTransactionModalBtn: document.getElementById("printTransactionModalBtn"),
+    transactionModalTitle: document.getElementById("transactionModalTitle"),
+    transactionModalMeta: document.getElementById("transactionModalMeta"),
+    transactionDetailItems: document.getElementById("transactionDetailItems"),
+    transactionDetailSummary: document.getElementById("transactionDetailSummary")
   };
 }
 
@@ -313,6 +331,7 @@ function bindEvents() {
   els.categoryMasterForm.addEventListener("submit", handleCategoryMasterSubmit);
   els.unitMasterForm.addEventListener("submit", handleUnitMasterSubmit);
   els.incomingForm.addEventListener("submit", handleIncomingSubmit);
+  els.recentSalesList.addEventListener("click", handleSaleActionClick);
 
   els.productGrid.addEventListener("click", handleProductGridClick);
   els.cashierCategoryChips.addEventListener("click", handleCashierCategoryClick);
@@ -354,6 +373,7 @@ function bindEvents() {
 
   els.exportCsvBtn.addEventListener("click", exportCurrentReportCsv);
   els.printReportBtn.addEventListener("click", printCurrentReport);
+  els.reportTableBody.addEventListener("click", handleReportTableClick);
 
   els.closeItemModalBtn.addEventListener("click", closeItemModal);
   els.cancelItemModalBtn.addEventListener("click", closeItemModal);
@@ -363,6 +383,9 @@ function bindEvents() {
   els.cancelSupplierModalBtn.addEventListener("click", closeSupplierModal);
   els.supplierModalBackdrop.addEventListener("click", closeSupplierModal);
   els.supplierForm.addEventListener("submit", handleSupplierSubmit);
+  els.closeTransactionModalBtn.addEventListener("click", closeTransactionModal);
+  els.transactionModalBackdrop.addEventListener("click", closeTransactionModal);
+  els.printTransactionModalBtn.addEventListener("click", () => printSaleReceipt(activeSaleId));
 }
 
 function createSeedState() {
@@ -588,6 +611,7 @@ function renderAll() {
   renderInventory();
   renderCashier();
   renderReports();
+  renderFinance();
   updateReportControls();
   updateInventoryMode();
 }
@@ -630,6 +654,11 @@ function updateHeader() {
       eyebrow: "Analitik",
       title: "Laporan Operasional",
       subtitle: "Pantau performa penjualan dan stok berdasarkan periode."
+    },
+    finance: {
+      eyebrow: "Keuangan",
+      title: "Keuangan Toko",
+      subtitle: "Pantau pendapatan, pengeluaran, keuntungan, dan margin toko."
     }
   }[state.ui.activeView];
 
@@ -676,7 +705,7 @@ function renderDashboard() {
   els.metricRevenueDelta.textContent =
     revenueDelta === 0
       ? "Nilai penjualan stabil dibanding kemarin"
-      : `${revenueDelta > 0 ? "+" : ""}${formatCurrency(Math.abs(revenueDelta))} dibanding kemarin`;
+      : `${revenueDelta > 0 ? "+" : "-"} ${formatCurrency(yesterdayRevenue)} pendapatan kemarin`;
 
   els.metricSku.textContent = formatNumber(state.inventory.length);
   els.metricSkuDetail.textContent = `${countSuppliers()} supplier aktif dalam data master`;
@@ -723,6 +752,10 @@ function renderDashboard() {
             <div class="activity-meta">
               <span>${formatShortDateTime(sale.date)}</span>
               <strong>${formatCurrency(sale.total)}</strong>
+            </div>
+            <div class="activity-actions">
+              <button class="mini-button" type="button" data-sale-action="detail" data-sale-id="${escapeHtml(sale.id)}">Detail</button>
+              <button class="mini-button" type="button" data-sale-action="print" data-sale-id="${escapeHtml(sale.id)}">Cetak Struk</button>
             </div>
           </article>
         `;
@@ -1043,6 +1076,48 @@ function renderReports() {
         <td colspan="${context.headers.length}">
           ${renderEmptyState("Tidak ada data laporan yang cocok dengan periode dan pencarian saat ini.")}
         </td>
+      </tr>
+    `;
+}
+
+function renderFinance() {
+  const summary = getFinanceSummary();
+  const ledger = getFinanceLedger();
+  const query = state.ui.searchQuery.trim().toLowerCase();
+  const filteredLedger = ledger.filter((entry) =>
+    matchesQuery([entry.type, entry.reference, entry.description, entry.direction], query)
+  );
+
+  els.financeRevenue.textContent = formatCurrency(summary.revenue);
+  els.financeExpense.textContent = formatCurrency(summary.expense);
+  els.financeProfit.textContent = formatCurrency(summary.profit);
+  els.financeMargin.textContent = `${formatNumber(summary.margin)}%`;
+  els.financeIncomeHint.textContent = `${formatNumber(summary.salesCount)} transaksi penjualan tercatat`;
+  els.financeExpenseHint.textContent = `${formatNumber(summary.receiptCount)} transaksi barang masuk tercatat`;
+  els.financeProfitHint.textContent = summary.profit >= 0 ? "Pendapatan masih lebih besar dari pengeluaran" : "Pengeluaran lebih besar dari pendapatan";
+  els.financeMarginHint.textContent = summary.revenue > 0 ? "Margin dihitung dari keuntungan terhadap pendapatan" : "Belum ada pendapatan untuk menghitung margin";
+
+  els.financeLedgerBody.innerHTML = filteredLedger.length
+    ? filteredLedger
+      .map((entry) => `
+        <tr>
+          <td>
+            <div class="name-cell">
+              <strong>${escapeHtml(formatShortDateTime(entry.date))}</strong>
+              <small>${escapeHtml(entry.reference)}</small>
+            </div>
+          </td>
+          <td><span class="stock-pill ${entry.direction === "income" ? "ok" : "low"}">${escapeHtml(entry.type)}</span></td>
+          <td>${escapeHtml(entry.description)}</td>
+          <td class="align-right">${entry.income ? formatCurrency(entry.income) : "-"}</td>
+          <td class="align-right">${entry.expense ? formatCurrency(entry.expense) : "-"}</td>
+          <td class="align-right"><strong>${formatCurrency(entry.balance)}</strong></td>
+        </tr>
+      `)
+      .join("")
+    : `
+      <tr>
+        <td colspan="6">${renderEmptyState("Belum ada data keuangan yang sesuai dengan pencarian.")}</td>
       </tr>
     `;
 }
@@ -1437,6 +1512,33 @@ function handleCashierCategoryClick(event) {
   renderAll();
 }
 
+function handleReportTableClick(event) {
+  const dayButton = event.target.closest("[data-report-day]");
+  if (dayButton) {
+    state.ui.reportPeriod = "daily";
+    state.ui.reportDate = dayButton.dataset.reportDay;
+    renderAll();
+    return;
+  }
+
+  handleSaleActionClick(event);
+}
+
+function handleSaleActionClick(event) {
+  const button = event.target.closest("[data-sale-action]");
+  if (!button) {
+    return;
+  }
+
+  const saleId = button.dataset.saleId;
+  if (button.dataset.saleAction === "print") {
+    printSaleReceipt(saleId);
+    return;
+  }
+
+  openTransactionModal(saleId);
+}
+
 function handleCartListClick(event) {
   const button = event.target.closest("button[data-cart-action]");
   if (!button) {
@@ -1595,6 +1697,9 @@ async function checkoutCart() {
     });
 
     setBootState(response.state);
+    state.ui.reportDate = formatDateInput(new Date());
+    state.ui.reportMonth = formatMonthInput(new Date());
+    state.ui.reportYear = String(new Date().getFullYear());
     renderAll();
     showToast("success", "Transaksi berhasil", response.message || "Transaksi berhasil disimpan.");
   } catch (error) {
@@ -1655,6 +1760,27 @@ function printReceipt() {
   }, 250);
 }
 
+function printSaleReceipt(saleId) {
+  const receipt = getSaleById(saleId);
+  if (!receipt) {
+    showToast("danger", "Struk tidak ditemukan", "Pilih transaksi yang valid untuk dicetak ulang.");
+    return;
+  }
+
+  const printWindow = window.open("", "_blank", "width=420,height=720");
+  if (!printWindow) {
+    showToast("danger", "Popup diblokir", "Izinkan popup browser untuk mencetak ulang struk.");
+    return;
+  }
+
+  printWindow.document.write(buildReceiptHtml(receipt));
+  printWindow.document.close();
+  printWindow.focus();
+  window.setTimeout(() => {
+    printWindow.print();
+  }, 250);
+}
+
 function getReportContext() {
   if (state.ui.reportType === "inventory") {
     return getInventoryReportContext();
@@ -1679,7 +1805,16 @@ function getSalesReportContext() {
     ];
     rows = sales
       .map((sale) => ({
-        transaction: `<div class="name-cell"><strong>${escapeHtml(sale.id)}</strong><small>${formatShortDateTime(sale.date)}</small></div>`,
+        transaction: `
+          <div class="name-cell">
+            <strong>${escapeHtml(sale.id)}</strong>
+            <small>${formatShortDateTime(sale.date)}</small>
+          </div>
+          <div class="table-actions table-actions-start">
+            <button class="mini-button" type="button" data-sale-action="detail" data-sale-id="${escapeHtml(sale.id)}">Detail</button>
+            <button class="mini-button" type="button" data-sale-action="print" data-sale-id="${escapeHtml(sale.id)}">Cetak Struk</button>
+          </div>
+        `,
         items: escapeHtml(summarizeTransactionItems(sale)),
         total: formatCurrency(sale.total)
       }))
@@ -1695,7 +1830,15 @@ function getSalesReportContext() {
     ];
     rows = groupSalesByDay(sales)
       .map((entry) => ({
-        date: `<div class="name-cell"><strong>${escapeHtml(entry.label)}</strong><small>${formatNumber(entry.count)} transaksi</small></div>`,
+        date: `
+          <div class="name-cell">
+            <strong>${escapeHtml(entry.label)}</strong>
+            <small>${formatNumber(entry.count)} transaksi</small>
+          </div>
+          <div class="table-actions table-actions-start">
+            <button class="mini-button" type="button" data-report-day="${escapeHtml(entry.key)}">Lihat Detail</button>
+          </div>
+        `,
         transactions: formatNumber(entry.count),
         revenue: formatCurrency(entry.total)
       }))
@@ -1849,7 +1992,8 @@ function printCurrentReport() {
     period: state.ui.reportPeriod,
     date: state.ui.reportDate,
     month: state.ui.reportMonth,
-    year: state.ui.reportYear
+    year: state.ui.reportYear,
+    fresh: String(Date.now())
   });
   const reportWindow = window.open(`${POS_ROUTES.reportPdf}?${query.toString()}`, "_blank");
   if (!reportWindow) {
@@ -1904,6 +2048,46 @@ function openSupplierModal(supplier = null) {
 
 function closeSupplierModal() {
   els.supplierModal.classList.add("hidden");
+}
+
+function openTransactionModal(saleId) {
+  const sale = getSaleById(saleId);
+  if (!sale) {
+    showToast("danger", "Transaksi tidak ditemukan", "Data transaksi ini tidak tersedia di daftar penjualan.");
+    return;
+  }
+
+  activeSaleId = sale.id;
+  els.transactionModalTitle.textContent = sale.id;
+  els.transactionModalMeta.textContent = `${formatShortDateTime(sale.date)} | ${formatNumber(sale.items.length)} item`;
+  els.transactionDetailItems.innerHTML = sale.items
+    .map((item) => `
+      <tr>
+        <td>
+          <div class="name-cell">
+            <strong>${escapeHtml(item.name)}</strong>
+            <small>${escapeHtml(item.sku)} | ${escapeHtml(item.category)}</small>
+          </div>
+        </td>
+        <td class="align-right">${formatQuantity(item.quantity)} ${escapeHtml(item.unit)}</td>
+        <td class="align-right">${formatCurrency(item.price)}</td>
+        <td class="align-right"><strong>${formatCurrency(Math.round(normalizeQuantity(item.quantity) * item.price))}</strong></td>
+      </tr>
+    `)
+    .join("");
+  els.transactionDetailSummary.innerHTML = `
+    <div><span>Subtotal</span><strong>${formatCurrency(sale.subtotal)}</strong></div>
+    <div><span>Diskon</span><strong>${formatCurrency(sale.discount)}</strong></div>
+    <div><span>Total</span><strong>${formatCurrency(sale.total)}</strong></div>
+    <div><span>Bayar</span><strong>${formatCurrency(sale.payment)}</strong></div>
+    <div><span>Kembalian</span><strong>${formatCurrency(sale.change)}</strong></div>
+  `;
+  els.transactionModal.classList.remove("hidden");
+}
+
+function closeTransactionModal() {
+  activeSaleId = null;
+  els.transactionModal.classList.add("hidden");
 }
 
 async function handleItemSubmit(event) {
@@ -2148,8 +2332,66 @@ function groupSalesByMonth(sales) {
     .map((entry) => entry[1]);
 }
 
+function getFinanceSummary() {
+  const revenue = state.sales.reduce((sum, sale) => sum + Number(sale.total || 0), 0);
+  const expense = state.goodsIn.reduce((sum, entry) => sum + getGoodsInTotal(entry), 0);
+  const profit = revenue - expense;
+  const margin = revenue > 0 ? Math.round((profit / revenue) * 10000) / 100 : 0;
+
+  return {
+    revenue,
+    expense,
+    profit,
+    margin,
+    salesCount: state.sales.length,
+    receiptCount: state.goodsIn.length
+  };
+}
+
+function getFinanceLedger() {
+  let runningBalance = 0;
+  const rows = [
+    ...state.sales.map((sale) => ({
+      date: sale.date,
+      type: "Pendapatan",
+      direction: "income",
+      reference: sale.id,
+      description: summarizeTransactionItems(sale),
+      income: Number(sale.total || 0),
+      expense: 0
+    })),
+    ...state.goodsIn.map((entry) => ({
+      date: entry.date,
+      type: "Pengeluaran",
+      direction: "expense",
+      reference: `IN-${entry.id}`,
+      description: `${entry.itemName} dari ${entry.supplier}`,
+      income: 0,
+      expense: getGoodsInTotal(entry)
+    }))
+  ].sort((left, right) => new Date(left.date) - new Date(right.date));
+
+  return rows
+    .map((entry) => {
+      runningBalance += entry.income - entry.expense;
+      return {
+        ...entry,
+        balance: runningBalance
+      };
+    })
+    .sort((left, right) => new Date(right.date) - new Date(left.date));
+}
+
+function getGoodsInTotal(entry) {
+  return Math.round(normalizeQuantity(entry.quantity) * Number(entry.cost || 0));
+}
+
 function getItemById(itemId) {
   return state.inventory.find((item) => String(item.id) === String(itemId));
+}
+
+function getSaleById(saleId) {
+  return state.sales.find((sale) => String(sale.id) === String(saleId));
 }
 
 function matchesQuery(values, query) {
@@ -2385,6 +2627,7 @@ function csvEscape(value) {
 function stripHtml(value) {
   const temp = document.createElement("div");
   temp.innerHTML = value;
+  temp.querySelectorAll(".table-actions, .activity-actions").forEach((node) => node.remove());
   return temp.textContent || temp.innerText || "";
 }
 

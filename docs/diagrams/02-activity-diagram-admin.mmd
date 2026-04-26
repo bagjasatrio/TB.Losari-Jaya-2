@@ -1,0 +1,30 @@
+﻿flowchart TD
+    Start([Mulai])
+    Login[Masukkan username dan password]
+    Valid{Login valid?}
+    Dashboard[Tampilkan dashboard]
+    Pilih{Pilih menu}
+
+    Barang[Kelola data barang]
+    Master[Kelola kategori, satuan, dan supplier]
+    Restock[Catat barang masuk]
+    Laporan[Filter laporan penjualan atau stok]
+    Export[Export CSV atau cetak PDF]
+    Keuangan[Lihat pendapatan, pengeluaran, keuntungan, margin]
+    Detail[Lihat detail transaksi]
+    Reset[Reset data demo]
+    Logout[Logout]
+    End([Selesai])
+
+    Start --> Login --> Valid
+    Valid -- Tidak --> Login
+    Valid -- Ya --> Dashboard --> Pilih
+
+    Pilih -- Barang --> Barang --> Dashboard
+    Pilih -- Master Data --> Master --> Dashboard
+    Pilih -- Barang Masuk --> Restock --> Dashboard
+    Pilih -- Laporan --> Laporan --> Export --> Dashboard
+    Pilih -- Keuangan --> Keuangan --> Dashboard
+    Pilih -- Detail Transaksi --> Detail --> Dashboard
+    Pilih -- Reset Demo --> Reset --> Dashboard
+    Pilih -- Logout --> Logout --> End
