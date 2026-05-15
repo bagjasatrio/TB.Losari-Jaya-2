@@ -167,6 +167,8 @@ img {
 .surface-panel {
   position: relative;
   z-index: 1;
+  min-width: 0;
+  max-width: 100%;
   background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(16px);
   border-radius: var(--radius-lg);
@@ -731,6 +733,7 @@ img {
 }
 
 .page-shell {
+  min-width: 0;
   min-height: 0;
   overflow: visible;
   padding-right: 0;
@@ -738,6 +741,7 @@ img {
 
 .page {
   display: none;
+  min-width: 0;
   padding: 0.35rem 0 1rem;
   animation: page-in 260ms ease;
 }
@@ -1102,13 +1106,82 @@ img {
 }
 
 .table-shell {
+  max-width: 100%;
+  min-width: 0;
   overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.inventory-table-shell {
+  padding-bottom: 0.35rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(73, 91, 124, 0.35) transparent;
+}
+
+.inventory-table-shell::-webkit-scrollbar {
+  height: 0.55rem;
+}
+
+.inventory-table-shell::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.inventory-table-shell::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(73, 91, 124, 0.35);
+}
+
+.table-scroll-sync {
+  max-width: 100%;
+  min-width: 0;
+  height: 0.85rem;
+  margin: 0 0 0.45rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(73, 91, 124, 0.45) transparent;
+}
+
+.table-scroll-sync > div {
+  height: 1px;
+}
+
+.table-scroll-sync::-webkit-scrollbar {
+  height: 0.55rem;
+}
+
+.table-scroll-sync::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.table-scroll-sync::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(73, 91, 124, 0.45);
 }
 
 .data-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0 0.7rem;
+}
+
+.inventory-mode {
+  min-width: 0;
+}
+
+.inventory-table {
+  min-width: 1180px;
+}
+
+.inventory-table .name-cell {
+  min-width: 14rem;
+}
+
+.inventory-table .table-actions {
+  min-width: 15rem;
+  flex-wrap: nowrap;
 }
 
 .data-table thead th {
@@ -1146,6 +1219,20 @@ img {
 
 .align-right {
   text-align: right;
+}
+
+.row-number {
+  color: var(--surface-muted);
+  font-weight: 800;
+  width: 3.75rem;
+  white-space: nowrap;
+}
+
+.price-cell {
+  max-width: 13rem;
+  min-width: 7rem;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .name-cell {
@@ -1681,6 +1768,14 @@ img {
   }
 
   .data-table thead {
+    display: none;
+  }
+
+  .inventory-table {
+    min-width: 0;
+  }
+
+  .table-scroll-sync {
     display: none;
   }
 

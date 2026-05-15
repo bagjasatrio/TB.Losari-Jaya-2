@@ -3,9 +3,12 @@
 namespace Tests\Feature;
 
 use App\Models\InventoryItem;
+use App\Models\GoodsReceipt;
 use App\Models\Sale;
+use App\Models\SaleItem;
 use App\Models\User;
 use App\Http\Controllers\PosController;
+use App\Services\PosDemoSeederService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -14,6 +17,29 @@ use Tests\TestCase;
 class InventoryMasterTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_seed_uses_excel_inventory_with_operational_activity(): void
+    {
+        app(PosDemoSeederService::class)->resetAndSeed();
+
+        $this->assertDatabaseCount('inventory_items', 369);
+        $this->assertDatabaseHas('inventory_items', [
+            'sku' => 'LJ2-001',
+            'name' => 'BESI 6 FULL KSTY',
+            'category' => 'BESI',
+            'price' => 40000,
+        ]);
+        $this->assertDatabaseMissing('inventory_items', [
+            'sku' => 'SMN-001',
+        ]);
+
+        $this->assertGreaterThan(0, (float) InventoryItem::query()->where('sku', 'LJ2-001')->value('stock'));
+        $this->assertDatabaseCount('sales', 18);
+        $this->assertDatabaseCount('goods_receipts', 24);
+        $this->assertGreaterThan(0, SaleItem::query()->count());
+        $this->assertGreaterThan(0, Sale::query()->sum('total'));
+        $this->assertGreaterThan(0, GoodsReceipt::query()->sum('unit_cost'));
+    }
 
     public function test_user_can_add_inventory_category_and_unit(): void
     {

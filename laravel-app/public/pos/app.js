@@ -4,32 +4,13 @@ const POS_BRAND = window.POS_BRAND || {};
 const BRAND_LOGO = POS_BRAND.logo || "/pos/logolj2.png";
 const BRAND_NAME = POS_BRAND.name || "TB. Losari Jaya 2";
 const BRAND_TAGLINE = POS_BRAND.tagline || "Industrial Atelier POS";
-const DEFAULT_CATEGORY_OPTIONS = [
-  "Material Dasar",
-  "Finishing & Cat",
-  "Perkakas",
-  "Plumbing & Pipa",
-  "Struktur",
-  "Aksesoris",
-  "Listrik"
-];
-const DEFAULT_UNIT_OPTIONS = [
-  "pcs",
-  "kg",
-  "gram",
-  "sak",
-  "box",
-  "btg",
-  "lembar",
-  "kaleng",
-  "meter",
-  "liter",
-  "roll"
-];
+const DEFAULT_CATEGORY_OPTIONS = Array.isArray(window.LOSARI_CATEGORY_OPTIONS) ? window.LOSARI_CATEGORY_OPTIONS : [];
+const DEFAULT_UNIT_OPTIONS = Array.isArray(window.LOSARI_UNIT_OPTIONS) ? window.LOSARI_UNIT_OPTIONS : [];
 
 let state;
 let els;
 let activeSaleId = null;
+let isSyncingInventoryScroll = false;
 
 const ADMIN_VIEWS = ["dashboard", "inventory", "cashier", "finance", "reports", "users"];
 const CASHIER_VIEWS = ["cashier"];
@@ -203,6 +184,9 @@ function cacheElements() {
     inventorySearch: document.getElementById("inventorySearch"),
     inventoryCategoryFilter: document.getElementById("inventoryCategoryFilter"),
     inventoryTableBody: document.getElementById("inventoryTableBody"),
+    inventoryTableShell: document.querySelector("[data-scroll-target='inventory']"),
+    inventoryScrollSync: document.querySelector("[data-scroll-sync='inventory']"),
+    inventoryScrollSyncInner: document.querySelector("[data-scroll-sync='inventory'] > div"),
     supplierSummaryCount: document.getElementById("supplierSummaryCount"),
     supplierTableBody: document.getElementById("supplierTableBody"),
     categoryMasterCount: document.getElementById("categoryMasterCount"),
@@ -352,6 +336,8 @@ function bindEvents() {
   });
 
   els.inventoryTableBody.addEventListener("click", handleInventoryTableClick);
+  bindInventoryScrollSync();
+  window.addEventListener("resize", updateInventoryScrollSync);
   els.supplierTableBody.addEventListener("click", handleSupplierTableClick);
   els.categoryMasterForm.addEventListener("submit", handleCategoryMasterSubmit);
   els.unitMasterForm.addEventListener("submit", handleUnitMasterSubmit);
@@ -414,168 +400,62 @@ function bindEvents() {
   els.printTransactionModalBtn.addEventListener("click", () => printSaleReceipt(activeSaleId));
 }
 
-function createSeedState() {
-  const inventory = [
-    {
-      id: "SMN-001",
-      sku: "SMN-001",
-      name: "Semen Tiga Roda 50kg",
-      category: "Material Dasar",
-      unit: "sak",
-      supplier: "PT Tiga Roda",
-      stock: 18,
-      minStock: 10,
-      price: 65000,
-      description: "Semen utama untuk kebutuhan struktur dan pasangan bata."
-    },
-    {
-      id: "PKU-050",
-      sku: "PKU-050",
-      name: "Paku Beton 5cm (Box)",
-      category: "Perkakas",
-      unit: "box",
-      supplier: "UD Baja Prima",
-      stock: 120,
-      minStock: 20,
-      price: 25000,
-      description: "Paku beton standar untuk kebutuhan pemasangan."
-    },
-    {
-      id: "CAT-102",
-      sku: "CAT-102",
-      name: "Cat Avian Putih 5kg",
-      category: "Finishing & Cat",
-      unit: "kaleng",
-      supplier: "PT Avian Brands",
-      stock: 2,
-      minStock: 5,
-      price: 145000,
-      description: "Cat dasar interior warna putih."
-    },
-    {
-      id: "PVC-004",
-      sku: "PVC-004",
-      name: "Pipa PVC Maspion 1\"",
-      category: "Plumbing & Pipa",
-      unit: "btg",
-      supplier: "PT Maspion",
-      stock: 30,
-      minStock: 8,
-      price: 32000,
-      description: "Pipa PVC ukuran 1 inci untuk instalasi air."
-    },
-    {
-      id: "BES-010",
-      sku: "BES-010",
-      name: "Besi Beton Polos 10mm",
-      category: "Struktur",
-      unit: "btg",
-      supplier: "CV Baja Sejahtera",
-      stock: 4,
-      minStock: 8,
-      price: 78000,
-      description: "Besi beton polos untuk kebutuhan konstruksi ringan."
-    },
-    {
-      id: "TRP-005",
-      sku: "TRP-005",
-      name: "Triplek Meranti 12mm",
-      category: "Material Dasar",
-      unit: "lembar",
-      supplier: "CV Kayu Indah",
-      stock: 50,
-      minStock: 10,
-      price: 145000,
-      description: "Triplek meranti untuk finishing dan meubel."
-    },
-    {
-      id: "DLX-045",
-      sku: "DLX-045",
-      name: "Cat Dulux Weathershield 2.5L",
-      category: "Finishing & Cat",
-      unit: "kaleng",
-      supplier: "PT Dulux",
-      stock: 5,
-      minStock: 6,
-      price: 285000,
-      description: "Cat eksterior premium tahan cuaca."
-    },
-    {
-      id: "PVC-088",
-      sku: "PVC-088",
-      name: "Pipa PVC Wavin 4\" AW",
-      category: "Plumbing & Pipa",
-      unit: "btg",
-      supplier: "PT Wavin",
-      stock: 2,
-      minStock: 5,
-      price: 95000,
-      description: "Pipa AW tekanan tinggi untuk saluran air."
-    },
-    {
-      id: "SMG-001",
-      sku: "SMG-001",
-      name: "Semen Gresik 50kg",
-      category: "Material Dasar",
-      unit: "sak",
-      supplier: "PT Semen Gresik",
-      stock: 120,
-      minStock: 15,
-      price: 65000,
-      description: "Alternatif semen proyek dengan pasokan stabil."
-    }
-  ];
+function bindInventoryScrollSync() {
+  const topScroll = els.inventoryScrollSync;
+  const tableScroll = els.inventoryTableShell;
 
-  const goodsInSpecs = [
-    { daysAgo: 1, hour: 8, itemId: "SMN-001", quantity: 30, cost: 61000, supplier: "PT Tiga Roda", note: "Restock untuk proyek perumahan baru." },
-    { daysAgo: 2, hour: 10, itemId: "PVC-088", quantity: 12, cost: 90000, supplier: "PT Wavin", note: "Persiapan stok pipa AW menjelang akhir pekan." },
-    { daysAgo: 3, hour: 9, itemId: "DLX-045", quantity: 24, cost: 260000, supplier: "PT Dulux", note: "Restock cat eksterior berdasarkan permintaan pelanggan." },
-    { daysAgo: 5, hour: 11, itemId: "BES-010", quantity: 20, cost: 72000, supplier: "CV Baja Sejahtera", note: "Pengadaan besi polos untuk proyek cor." }
-  ];
+  if (!topScroll || !tableScroll) {
+    return;
+  }
 
-  const salesSpecs = [
-    { daysAgo: 0, hour: 8, minute: 30, items: [["SMN-001", 2], ["PKU-050", 1]], discount: 0, payment: 160000 },
-    { daysAgo: 0, hour: 10, minute: 15, items: [["CAT-102", 1]], discount: 5000, payment: 150000 },
-    { daysAgo: 0, hour: 11, minute: 20, items: [["PVC-004", 4]], discount: 0, payment: 150000 },
-    { daysAgo: 0, hour: 13, minute: 45, items: [["SMG-001", 3], ["TRP-005", 1]], discount: 10000, payment: 350000 },
-    { daysAgo: 0, hour: 15, minute: 5, items: [["BES-010", 2]], discount: 0, payment: 200000 },
-    { daysAgo: 1, hour: 9, minute: 5, items: [["SMN-001", 1], ["DLX-045", 1]], discount: 15000, payment: 360000 },
-    { daysAgo: 1, hour: 14, minute: 40, items: [["PVC-088", 2]], discount: 0, payment: 200000 },
-    { daysAgo: 2, hour: 10, minute: 0, items: [["TRP-005", 2], ["PKU-050", 3]], discount: 5000, payment: 400000 },
-    { daysAgo: 2, hour: 16, minute: 20, items: [["SMG-001", 5]], discount: 0, payment: 330000 },
-    { daysAgo: 3, hour: 8, minute: 55, items: [["DLX-045", 1], ["CAT-102", 1]], discount: 20000, payment: 450000 },
-    { daysAgo: 4, hour: 13, minute: 15, items: [["PVC-004", 10]], discount: 5000, payment: 350000 },
-    { daysAgo: 5, hour: 12, minute: 5, items: [["BES-010", 4], ["PKU-050", 2]], discount: 0, payment: 380000 },
-    { daysAgo: 6, hour: 10, minute: 45, items: [["TRP-005", 3]], discount: 0, payment: 450000 },
-    { daysAgo: 7, hour: 15, minute: 35, items: [["SMN-001", 4], ["PVC-088", 1]], discount: 10000, payment: 360000 },
-    { daysAgo: 8, hour: 9, minute: 50, items: [["SMG-001", 6], ["PKU-050", 4]], discount: 20000, payment: 500000 },
-    { daysAgo: 9, hour: 14, minute: 0, items: [["CAT-102", 2], ["PVC-004", 3]], discount: 10000, payment: 420000 }
-  ];
+  topScroll.addEventListener("scroll", () => syncInventoryScroll(topScroll, tableScroll));
+  tableScroll.addEventListener("scroll", () => syncInventoryScroll(tableScroll, topScroll));
+}
 
-  const goodsIn = goodsInSpecs.map((entry, index) => {
-    const item = inventory.find((current) => current.id === entry.itemId);
-    return {
-      id: `IN-${index + 1}-${Date.now()}`,
-      date: createIsoDate(entry.daysAgo, entry.hour, 0),
-      itemId: entry.itemId,
-      itemName: item.name,
-      quantity: entry.quantity,
-      cost: entry.cost,
-      supplier: entry.supplier,
-      note: entry.note
-    };
+function syncInventoryScroll(source, target) {
+  if (isSyncingInventoryScroll) {
+    return;
+  }
+
+  isSyncingInventoryScroll = true;
+  target.scrollLeft = source.scrollLeft;
+  requestAnimationFrame(() => {
+    isSyncingInventoryScroll = false;
   });
+}
 
-  const sales = salesSpecs.map((entry, index) => createSaleRecord(entry, inventory, index + 1));
+function updateInventoryScrollSync() {
+  const topScroll = els.inventoryScrollSync;
+  const topScrollInner = els.inventoryScrollSyncInner;
+  const tableScroll = els.inventoryTableShell;
+
+  if (!topScroll || !topScrollInner || !tableScroll) {
+    return;
+  }
+
+  const scrollWidth = tableScroll.scrollWidth;
+  const canScroll = scrollWidth > tableScroll.clientWidth + 1;
+
+  topScrollInner.style.width = `${scrollWidth}px`;
+  topScroll.classList.toggle("hidden", !canScroll);
+  topScroll.scrollLeft = tableScroll.scrollLeft;
+}
+
+function createSeedState() {
+  const seed = createOperationalSeed(createInventorySeed());
+  const supplierName = "TB. Losari Jaya 2";
 
   return {
-    version: "legacy-demo-state",
-    inventory,
+    version: "excel-inventory-state",
+    inventory: seed.inventory,
+    categories: getSeedCategoryOptions(seed.inventory),
+    units: getSeedUnitOptions(seed.inventory),
+    suppliers: [{ id: "SUP-001", name: supplierName, itemsCount: seed.inventory.length, receiptsCount: seed.goodsIn.length }],
     users: [],
-    goodsIn,
-    sales,
+    goodsIn: seed.goodsIn,
+    sales: seed.sales,
     cart: [],
-    lastReceipt: sales[0] || null,
+    lastReceipt: seed.sales[0] || null,
     auth: {
       isLoggedIn: false,
       userName: "Admin Losari",
@@ -601,35 +481,269 @@ function createSeedState() {
   };
 }
 
-function createSaleRecord(entry, inventory, index) {
-  const items = entry.items.map(([itemId, quantity]) => {
-    const item = inventory.find((current) => current.id === itemId);
+function createInventorySeed() {
+  const source = Array.isArray(window.LOSARI_INVENTORY_DATA) ? window.LOSARI_INVENTORY_DATA : [];
+
+  return source.map((item, index) => {
+    const sku = String(item.sku || item.id || "LJ2-" + String(index + 1).padStart(3, "0"));
+    const priceTexts = getItemPriceTexts(item);
+
     return {
-      itemId: item.id,
-      sku: item.sku,
-      name: item.name,
-      category: item.category,
-      unit: item.unit,
-      quantity,
-      price: item.price
+      id: String(item.id || sku),
+      sku,
+      name: String(item.name || "Barang Tanpa Nama"),
+      category: String(item.category || "Tanpa Kategori"),
+      unit: String(item.unit || "pcs"),
+      supplier: String(item.supplier || "TB. Losari Jaya 2"),
+      stock: normalizeQuantity(item.stock),
+      minStock: normalizeQuantity(item.minStock ?? 1),
+      price: Number.isFinite(Number(item.price)) ? Number(item.price) : 0,
+      basePriceText: priceTexts.base,
+      storePriceText: priceTexts.store,
+      retailPriceText: priceTexts.retail,
+      description: String(item.description || "")
+    };
+  });
+}
+
+function createOperationalSeed(inventory) {
+  const seededInventory = inventory.map((item, index) => {
+    const stock = normalizeQuantity(item.stock) > 0 ? normalizeQuantity(item.stock) : deriveSeedStock(item, index);
+
+    return {
+      ...item,
+      stock,
+      minStock: deriveSeedMinStock(item, index, stock)
     };
   });
 
-  const subtotal = items.reduce((sum, item) => sum + Math.round(normalizeQuantity(item.quantity) * item.price), 0);
-  const discount = entry.discount || 0;
-  const total = subtotal - discount;
-  const payment = Math.max(entry.payment || total, total);
+  const goodsIn = createGoodsInSeed(seededInventory);
+  const sales = createSalesSeed(seededInventory);
 
   return {
-    id: createTransactionNumberFromDate(createIsoDate(entry.daysAgo, entry.hour, entry.minute), index),
-    date: createIsoDate(entry.daysAgo, entry.hour, entry.minute),
-    items,
-    subtotal,
-    discount,
-    total,
-    payment,
-    change: payment - total
+    inventory: seededInventory,
+    goodsIn,
+    sales
   };
+}
+
+function createGoodsInSeed(inventory) {
+  return inventory
+    .filter((item, index) => item.price > 0 && (index < 12 || index % 7 === 0))
+    .slice(0, 24)
+    .map((item, index) => {
+      const quantity = deriveRestockQuantity(item, index);
+      const cost = parsePriceTextNumber(item.basePriceText) || Math.round(item.price * 0.85);
+
+      return {
+        id: index + 1,
+        date: createIsoDate((index % 12) + 1, 8 + (index % 5), 0),
+        itemId: item.id,
+        itemName: item.name,
+        quantity,
+        cost,
+        supplier: item.supplier || "TB. Losari Jaya 2",
+        note: `Restock awal ${item.category} berdasarkan dataset Excel.`
+      };
+    });
+}
+
+function createSalesSeed(inventory) {
+  const candidates = inventory.filter((item) => item.price > 0 && item.stock > item.minStock);
+  const daysAgo = [0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+
+  if (!candidates.length) {
+    return [];
+  }
+
+  return daysAgo
+    .map((day, index) => {
+      const date = createIsoDate(day, 8 + (index % 9), (index * 10) % 60);
+      const itemCount = 1 + (index % 3);
+      const usedIds = new Set();
+      const items = [];
+
+      for (let offset = 0; offset < itemCount; offset += 1) {
+        const item = candidates[(index * 7 + offset * 13) % candidates.length];
+        if (!item || usedIds.has(item.id)) {
+          continue;
+        }
+
+        usedIds.add(item.id);
+        const quantity = deriveSaleQuantity(item, index + offset);
+        items.push({
+          itemId: item.id,
+          sku: item.sku,
+          name: item.name,
+          category: item.category,
+          unit: item.unit,
+          quantity,
+          price: item.price
+        });
+      }
+
+      const subtotal = items.reduce((sum, item) => sum + Math.round(item.price * item.quantity), 0);
+      const discount = subtotal > 250000 && index % 3 === 0 ? roundToNearest(Math.min(subtotal * 0.03, 25000), 1000) : 0;
+      const total = Math.max(0, subtotal - discount);
+      const payment = roundUpTo(total, 10000);
+
+      return {
+        id: createTransactionNumberFromDate(date, index + 1),
+        date,
+        items,
+        subtotal,
+        discount,
+        total,
+        payment,
+        change: payment - total
+      };
+    })
+    .filter((sale) => sale.items.length && sale.total > 0)
+    .sort((left, right) => new Date(right.date) - new Date(left.date));
+}
+
+function deriveSeedStock(item, index) {
+  const price = Number(item.price || 0);
+  const unit = String(item.unit || "").toLowerCase();
+  let stock = 20 + (index % 14) * 2;
+
+  if (unit.includes("kg")) {
+    stock = 12 + (index % 8) * 2;
+  } else if (unit.includes("sak")) {
+    stock = 10 + (index % 6) * 3;
+  } else if (unit.includes("btg")) {
+    stock = 16 + (index % 10) * 3;
+  } else if (unit.includes("roll")) {
+    stock = 8 + (index % 6) * 2;
+  } else if (unit.includes("lembar")) {
+    stock = 14 + (index % 7) * 3;
+  }
+
+  if (price >= 1000000) {
+    stock = Math.max(2, Math.round(stock * 0.25));
+  } else if (price >= 500000) {
+    stock = Math.max(3, Math.round(stock * 0.35));
+  } else if (price >= 200000) {
+    stock = Math.max(5, Math.round(stock * 0.55));
+  }
+
+  if ((index + 1) % 17 === 0) {
+    stock = Math.max(1, Math.min(stock, 3));
+  }
+
+  return normalizeQuantity(stock);
+}
+
+function deriveSeedMinStock(item, index, stock) {
+  const currentMinStock = normalizeQuantity(item.minStock);
+
+  if (currentMinStock > 1) {
+    return currentMinStock;
+  }
+
+  if ((index + 1) % 17 === 0) {
+    return Math.max(2, normalizeQuantity(stock + 1));
+  }
+
+  return Math.max(1, Math.min(12, Math.round(stock * 0.2)));
+}
+
+function deriveRestockQuantity(item, index) {
+  const unit = String(item.unit || "").toLowerCase();
+
+  if (unit.includes("kg")) {
+    return 5 + (index % 5) * 2;
+  }
+
+  if (unit.includes("sak")) {
+    return 8 + (index % 4) * 4;
+  }
+
+  if (unit.includes("roll")) {
+    return 4 + (index % 4) * 2;
+  }
+
+  return 10 + (index % 6) * 3;
+}
+
+function deriveSaleQuantity(item, seed) {
+  const unit = String(item.unit || "").toLowerCase();
+  const price = Number(item.price || 0);
+  const available = Math.max(1, Math.floor(normalizeQuantity(item.stock) - normalizeQuantity(item.minStock)));
+  let quantity = 1 + (seed % 3);
+
+  if (unit.includes("kg")) {
+    quantity = [0.5, 1, 2][seed % 3];
+  } else if (price >= 500000) {
+    quantity = 1;
+  } else if (price < 25000) {
+    quantity = 2 + (seed % 5);
+  }
+
+  return normalizeQuantity(Math.min(quantity, available));
+}
+
+function parsePriceTextNumber(value) {
+  const number = Number(String(value || "").replace(/[^\d]/g, ""));
+  return Number.isFinite(number) ? number : 0;
+}
+
+function roundToNearest(value, step) {
+  return Math.round(value / step) * step;
+}
+
+function roundUpTo(value, step) {
+  return Math.ceil(value / step) * step;
+}
+
+function getItemPriceTexts(item) {
+  const description = String(item.description || "");
+  const hasTieredPrices =
+    item.basePriceText !== undefined ||
+    item.storePriceText !== undefined ||
+    item.retailPriceText !== undefined ||
+    /Harga dasar:|Harga toko:|Harga eceran:/i.test(description);
+  const retailFallback = !hasTieredPrices && Number(item.price) > 0 ? formatCurrency(Number(item.price)) : "-";
+
+  return {
+    base: normalizePriceText(item.basePriceText ?? extractPriceText(description, "Harga dasar")),
+    store: normalizePriceText(item.storePriceText ?? extractPriceText(description, "Harga toko")),
+    retail: normalizePriceText((item.retailPriceText ?? extractPriceText(description, "Harga eceran")) || retailFallback)
+  };
+}
+
+function extractPriceText(description, label) {
+  const marker = `${label}:`;
+  const start = description.toLowerCase().indexOf(marker.toLowerCase());
+
+  if (start === -1) {
+    return "";
+  }
+
+  const tail = description.slice(start + marker.length);
+  const separators = [" | Harga dasar:", " | Harga toko:", " | Harga eceran:", " | Sumber:"]
+    .map((separator) => tail.toLowerCase().indexOf(separator.toLowerCase()))
+    .filter((position) => position >= 0);
+  const end = separators.length ? Math.min(...separators) : tail.length;
+
+  return tail.slice(0, end).trim();
+}
+
+function normalizePriceText(value) {
+  const text = String(value ?? "").trim();
+  return text && text.toLowerCase() !== "undefined" ? text : "-";
+}
+
+function getSeedCategoryOptions(inventory) {
+  return Array.isArray(window.LOSARI_CATEGORY_OPTIONS)
+    ? [...window.LOSARI_CATEGORY_OPTIONS]
+    : uniqueSorted(inventory.map((item) => item.category));
+}
+
+function getSeedUnitOptions(inventory) {
+  return Array.isArray(window.LOSARI_UNIT_OPTIONS)
+    ? [...window.LOSARI_UNIT_OPTIONS]
+    : uniqueSorted(inventory.map((item) => item.unit));
 }
 
 function renderAll() {
@@ -875,10 +989,11 @@ function renderInventory() {
 
   els.inventoryTableBody.innerHTML = inventoryRows.length
     ? inventoryRows
-      .map((item) => {
+      .map((item, index) => {
         const stockClass = item.stock <= item.minStock ? "low" : "ok";
         return `
           <tr>
+            <td class="align-right row-number">${formatNumber(index + 1)}</td>
             <td>
               <div class="name-cell">
                 <strong>${escapeHtml(item.name)}</strong>
@@ -888,7 +1003,9 @@ function renderInventory() {
             <td>${escapeHtml(item.category)}</td>
             <td>${escapeHtml(item.supplier)}</td>
             <td><span class="stock-pill ${stockClass}">${formatQuantity(item.stock)} ${escapeHtml(item.unit)}</span></td>
-            <td>${formatCurrency(item.price)}</td>
+            <td class="price-cell">${escapeHtml(getItemPriceTexts(item).base)}</td>
+            <td class="price-cell">${escapeHtml(getItemPriceTexts(item).store)}</td>
+            <td class="price-cell">${escapeHtml(getItemPriceTexts(item).retail)}</td>
             <td class="align-right">
               <div class="table-actions">
                 <button class="mini-button" type="button" data-action="edit" data-item-id="${escapeHtml(item.id)}">Edit</button>
@@ -902,7 +1019,7 @@ function renderInventory() {
       .join("")
     : `
       <tr>
-        <td colspan="6">${renderEmptyState("Barang tidak ditemukan. Coba ubah kata kunci atau kategori.")}</td>
+        <td colspan="9">${renderEmptyState("Barang tidak ditemukan. Coba ubah kata kunci atau kategori.")}</td>
       </tr>
     `;
 
@@ -971,6 +1088,8 @@ function renderInventory() {
   if (!els.incomingDate.value) {
     els.incomingDate.value = formatDateInput(new Date());
   }
+
+  requestAnimationFrame(updateInventoryScrollSync);
 }
 
 function renderCashier() {
@@ -1501,7 +1620,7 @@ async function logout() {
 }
 
 async function resetDemo() {
-  if (!window.confirm("Reset semua data demo ke kondisi awal?")) {
+  if (!window.confirm("Reset data stok dari dataset Excel?")) {
     return;
   }
 
@@ -1511,7 +1630,7 @@ async function resetDemo() {
     });
     setBootState(response.state);
     renderAll();
-    showToast("info", "Data demo direset", response.message || "Seluruh data demo dikembalikan ke kondisi awal.");
+    showToast("info", "Data stok direset", response.message || "Master barang dikembalikan dari dataset Excel.");
   } catch (error) {
     showToast("danger", "Reset gagal", error.message);
   }

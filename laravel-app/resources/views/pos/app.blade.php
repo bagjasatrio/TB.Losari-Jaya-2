@@ -150,7 +150,7 @@
       <div class="sidebar-foot">
         <button id="resetDemoBtn" class="button button-muted button-block" type="button">
           <span class="material-symbols-outlined">refresh</span>
-          Reset Demo
+          Reset Data
         </button>
         <button id="logoutBtn" class="nav-item nav-item-foot" type="button">
           <span class="material-symbols-outlined">logout</span>
@@ -345,15 +345,21 @@
             </div>
 
             <article class="surface-panel">
-              <div class="table-shell">
-                <table class="data-table">
+              <div class="table-scroll-sync inventory-scroll-sync" data-scroll-sync="inventory" aria-label="Geser tabel daftar barang" tabindex="0">
+                <div></div>
+              </div>
+              <div class="table-shell inventory-table-shell" data-scroll-target="inventory">
+                <table class="data-table inventory-table">
                   <thead>
                     <tr>
+                      <th class="align-right">No</th>
                       <th>Nama Barang</th>
                       <th>Kategori</th>
                       <th>Supplier</th>
                       <th>Stok</th>
-                      <th>Harga Jual</th>
+                      <th>Harga Dasar</th>
+                      <th>Harga Toko</th>
+                      <th>Harga Eceran</th>
                       <th class="align-right">Aksi</th>
                     </tr>
                   </thead>
@@ -869,7 +875,7 @@
 
         <label class="field">
           <span>SKU</span>
-          <input id="itemSku" name="sku" type="text" placeholder="SMN-001" required>
+          <input id="itemSku" name="sku" type="text" placeholder="LJ2-001" required>
         </label>
 
         <label class="field">
@@ -1003,6 +1009,7 @@
       tagline: "Industrial Atelier POS"
     };
   </script>
+  <script src="{{ asset('pos/inventory-data.js') }}"></script>
   <script src="{{ asset('pos/app.js') }}"></script>
 </body>
 </html>

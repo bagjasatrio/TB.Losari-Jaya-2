@@ -103,6 +103,8 @@ class PosBootstrapService
 
     private function serializeInventoryItem(InventoryItem $item): array
     {
+        $description = $item->description ?? '';
+
         return [
             'id' => $item->id,
             'sku' => $item->sku,
@@ -113,7 +115,10 @@ class PosBootstrapService
             'stock' => $this->decimal($item->stock),
             'minStock' => $this->decimal($item->min_stock),
             'price' => (int) $item->price,
-            'description' => $item->description ?? '',
+            'basePriceText' => $this->priceTextFromDescription($description, 'Harga dasar'),
+            'storePriceText' => $this->priceTextFromDescription($description, 'Harga toko'),
+            'retailPriceText' => $this->priceTextFromDescription($description, 'Harga eceran'),
+            'description' => $description,
         ];
     }
 
@@ -171,5 +176,30 @@ class PosBootstrapService
     private function decimal(mixed $value): float
     {
         return (float) $value;
+    }
+
+    private function priceTextFromDescription(string $description, string $label): string
+    {
+        $marker = $label.':';
+        $start = stripos($description, $marker);
+
+        if ($start === false) {
+            return '-';
+        }
+
+        $tail = substr($description, $start + strlen($marker));
+        $end = strlen($tail);
+
+        foreach ([' | Harga dasar:', ' | Harga toko:', ' | Harga eceran:', ' | Sumber:'] as $separator) {
+            $position = stripos($tail, $separator);
+
+            if ($position !== false) {
+                $end = min($end, $position);
+            }
+        }
+
+        $value = trim(substr($tail, 0, $end));
+
+        return $value !== '' ? $value : '-';
     }
 }

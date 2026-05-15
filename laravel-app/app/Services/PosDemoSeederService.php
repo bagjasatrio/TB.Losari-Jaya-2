@@ -7,9 +7,11 @@ use App\Models\InventoryCategory;
 use App\Models\InventoryItem;
 use App\Models\InventoryUnit;
 use App\Models\Sale;
+use App\Models\SaleItem;
 use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 
@@ -18,13 +20,17 @@ class PosDemoSeederService
     public function resetAndSeed(): User
     {
         Schema::disableForeignKeyConstraints();
-        Sale::query()->delete();
-        GoodsReceipt::query()->delete();
-        InventoryItem::query()->delete();
-        Supplier::query()->delete();
-        InventoryCategory::query()->delete();
-        InventoryUnit::query()->delete();
-        Schema::enableForeignKeyConstraints();
+        try {
+            SaleItem::query()->delete();
+            Sale::query()->delete();
+            GoodsReceipt::query()->delete();
+            InventoryItem::query()->delete();
+            Supplier::query()->delete();
+            InventoryCategory::query()->delete();
+            InventoryUnit::query()->delete();
+        } finally {
+            Schema::enableForeignKeyConstraints();
+        }
 
         $admin = User::query()->updateOrCreate(
             ['username' => 'admin'],
@@ -46,213 +52,102 @@ class PosDemoSeederService
             ],
         );
 
-        $supplierNames = [
-            'PT Tiga Roda',
-            'UD Baja Prima',
-            'PT Avian Brands',
-            'PT Maspion',
-            'CV Baja Sejahtera',
-            'CV Kayu Indah',
-            'PT Dulux',
-            'PT Wavin',
-            'PT Semen Gresik',
-        ];
+        $supplier = Supplier::query()->create([
+            'name' => 'TB. Losari Jaya 2',
+        ]);
 
-        $suppliers = collect($supplierNames)
-            ->mapWithKeys(fn (string $name) => [$name => Supplier::query()->create(['name' => $name])]);
+        $items = collect(require database_path('seeders/data/losari_inventory.php'));
 
-        collect([
-            'Material Dasar',
-            'Finishing & Cat',
-            'Perkakas',
-            'Plumbing & Pipa',
-            'Struktur',
-            'Aksesoris',
-            'Listrik',
-        ])->each(fn (string $name) => InventoryCategory::query()->create(['name' => $name]));
+        $items
+            ->pluck('category')
+            ->unique()
+            ->sort()
+            ->values()
+            ->each(fn (string $name) => InventoryCategory::query()->create(['name' => $name]));
 
-        collect([
-            'pcs',
-            'kg',
-            'gram',
-            'sak',
-            'box',
-            'btg',
-            'lembar',
-            'kaleng',
-            'meter',
-            'liter',
-            'roll',
-        ])->each(fn (string $name) => InventoryUnit::query()->create(['name' => $name]));
+        $items
+            ->pluck('unit')
+            ->unique()
+            ->sort()
+            ->values()
+            ->each(fn (string $name) => InventoryUnit::query()->create(['name' => $name]));
 
-        $items = collect([
-            [
-                'sku' => 'SMN-001',
-                'name' => 'Semen Tiga Roda 50kg',
-                'category' => 'Material Dasar',
-                'unit' => 'sak',
-                'supplier' => 'PT Tiga Roda',
-                'stock' => 18,
-                'min_stock' => 10,
-                'price' => 65000,
-                'description' => 'Semen utama untuk kebutuhan struktur dan pasangan bata.',
-            ],
-            [
-                'sku' => 'PKU-050',
-                'name' => 'Paku Beton 5cm (Box)',
-                'category' => 'Perkakas',
-                'unit' => 'box',
-                'supplier' => 'UD Baja Prima',
-                'stock' => 120,
-                'min_stock' => 20,
-                'price' => 25000,
-                'description' => 'Paku beton standar untuk kebutuhan pemasangan.',
-            ],
-            [
-                'sku' => 'PKP-025',
-                'name' => 'Paku Payung Curah',
-                'category' => 'Perkakas',
-                'unit' => 'kg',
-                'supplier' => 'UD Baja Prima',
-                'stock' => 12.5,
-                'min_stock' => 2,
-                'price' => 22000,
-                'description' => 'Paku payung curah yang dapat dijual per 1/4 kg atau 1/2 kg.',
-            ],
-            [
-                'sku' => 'CAT-102',
-                'name' => 'Cat Avian Putih 5kg',
-                'category' => 'Finishing & Cat',
-                'unit' => 'kaleng',
-                'supplier' => 'PT Avian Brands',
-                'stock' => 2,
-                'min_stock' => 5,
-                'price' => 145000,
-                'description' => 'Cat dasar interior warna putih.',
-            ],
-            [
-                'sku' => 'PVC-004',
-                'name' => 'Pipa PVC Maspion 1"',
-                'category' => 'Plumbing & Pipa',
-                'unit' => 'btg',
-                'supplier' => 'PT Maspion',
-                'stock' => 30,
-                'min_stock' => 8,
-                'price' => 32000,
-                'description' => 'Pipa PVC ukuran 1 inci untuk instalasi air.',
-            ],
-            [
-                'sku' => 'BES-010',
-                'name' => 'Besi Beton Polos 10mm',
-                'category' => 'Struktur',
-                'unit' => 'btg',
-                'supplier' => 'CV Baja Sejahtera',
-                'stock' => 4,
-                'min_stock' => 8,
-                'price' => 78000,
-                'description' => 'Besi beton polos untuk kebutuhan konstruksi ringan.',
-            ],
-            [
-                'sku' => 'TRP-005',
-                'name' => 'Triplek Meranti 12mm',
-                'category' => 'Material Dasar',
-                'unit' => 'lembar',
-                'supplier' => 'CV Kayu Indah',
-                'stock' => 50,
-                'min_stock' => 10,
-                'price' => 145000,
-                'description' => 'Triplek meranti untuk finishing dan meubel.',
-            ],
-            [
-                'sku' => 'DLX-045',
-                'name' => 'Cat Dulux Weathershield 2.5L',
-                'category' => 'Finishing & Cat',
-                'unit' => 'kaleng',
-                'supplier' => 'PT Dulux',
-                'stock' => 5,
-                'min_stock' => 6,
-                'price' => 285000,
-                'description' => 'Cat eksterior premium tahan cuaca.',
-            ],
-            [
-                'sku' => 'PVC-088',
-                'name' => 'Pipa PVC Wavin 4" AW',
-                'category' => 'Plumbing & Pipa',
-                'unit' => 'btg',
-                'supplier' => 'PT Wavin',
-                'stock' => 2,
-                'min_stock' => 5,
-                'price' => 95000,
-                'description' => 'Pipa AW tekanan tinggi untuk saluran air.',
-            ],
-            [
-                'sku' => 'SMG-001',
-                'name' => 'Semen Gresik 50kg',
-                'category' => 'Material Dasar',
-                'unit' => 'sak',
-                'supplier' => 'PT Semen Gresik',
-                'stock' => 120,
-                'min_stock' => 15,
-                'price' => 65000,
-                'description' => 'Alternatif semen proyek dengan pasokan stabil.',
-            ],
-        ])->mapWithKeys(function (array $item) use ($suppliers) {
-            $model = InventoryItem::query()->create([
-                'sku' => $item['sku'],
-                'name' => $item['name'],
-                'category' => $item['category'],
-                'unit' => $item['unit'],
-                'supplier_id' => $suppliers[$item['supplier']]->id,
-                'stock' => $item['stock'],
-                'min_stock' => $item['min_stock'],
-                'price' => $item['price'],
-                'description' => $item['description'],
-            ]);
+        $inventoryItems = $items
+            ->values()
+            ->map(function (array $item, int $index) use ($supplier) {
+                $stock = $this->deriveSeedStock($item, $index);
 
-            return [$item['sku'] => $model];
-        });
+                return InventoryItem::query()->create([
+                    'sku' => $item['sku'],
+                    'name' => $item['name'],
+                    'category' => $item['category'],
+                    'unit' => $item['unit'],
+                    'supplier_id' => $supplier->id,
+                    'stock' => $stock,
+                    'min_stock' => $this->deriveSeedMinStock($item, $index, $stock),
+                    'price' => $item['price'],
+                    'description' => $item['description'],
+                ]);
+            });
 
-        collect([
-            ['days_ago' => 1, 'hour' => 8, 'sku' => 'SMN-001', 'quantity' => 30, 'cost' => 61000, 'supplier' => 'PT Tiga Roda', 'note' => 'Restock untuk proyek perumahan baru.'],
-            ['days_ago' => 2, 'hour' => 10, 'sku' => 'PVC-088', 'quantity' => 12, 'cost' => 90000, 'supplier' => 'PT Wavin', 'note' => 'Persiapan stok pipa AW menjelang akhir pekan.'],
-            ['days_ago' => 3, 'hour' => 9, 'sku' => 'DLX-045', 'quantity' => 24, 'cost' => 260000, 'supplier' => 'PT Dulux', 'note' => 'Restock cat eksterior berdasarkan permintaan pelanggan.'],
-            ['days_ago' => 5, 'hour' => 11, 'sku' => 'BES-010', 'quantity' => 20, 'cost' => 72000, 'supplier' => 'CV Baja Sejahtera', 'note' => 'Pengadaan besi polos untuk proyek cor.'],
-        ])->each(function (array $receipt) use ($items, $suppliers) {
-            GoodsReceipt::query()->create([
-                'inventory_item_id' => $items[$receipt['sku']]->id,
-                'supplier_id' => $suppliers[$receipt['supplier']]->id,
-                'quantity' => $receipt['quantity'],
-                'unit_cost' => $receipt['cost'],
-                'received_at' => $this->makeDate($receipt['days_ago'], $receipt['hour']),
-                'note' => $receipt['note'],
-            ]);
-        });
+        $this->seedGoodsReceipts($inventoryItems, $supplier);
+        $this->seedSales($inventoryItems, $admin);
 
-        collect([
-            ['days_ago' => 0, 'hour' => 8, 'minute' => 30, 'items' => [['SMN-001', 2], ['PKU-050', 1], ['PKP-025', 0.5]], 'discount' => 0, 'payment' => 170000],
-            ['days_ago' => 0, 'hour' => 10, 'minute' => 15, 'items' => [['CAT-102', 1]], 'discount' => 5000, 'payment' => 150000],
-            ['days_ago' => 0, 'hour' => 11, 'minute' => 20, 'items' => [['PVC-004', 4]], 'discount' => 0, 'payment' => 150000],
-            ['days_ago' => 0, 'hour' => 13, 'minute' => 45, 'items' => [['SMG-001', 3], ['TRP-005', 1]], 'discount' => 10000, 'payment' => 350000],
-            ['days_ago' => 0, 'hour' => 15, 'minute' => 5, 'items' => [['BES-010', 2]], 'discount' => 0, 'payment' => 200000],
-            ['days_ago' => 1, 'hour' => 9, 'minute' => 5, 'items' => [['SMN-001', 1], ['DLX-045', 1]], 'discount' => 15000, 'payment' => 360000],
-            ['days_ago' => 1, 'hour' => 14, 'minute' => 40, 'items' => [['PVC-088', 2]], 'discount' => 0, 'payment' => 200000],
-            ['days_ago' => 2, 'hour' => 10, 'minute' => 0, 'items' => [['TRP-005', 2], ['PKU-050', 3]], 'discount' => 5000, 'payment' => 400000],
-            ['days_ago' => 2, 'hour' => 16, 'minute' => 20, 'items' => [['SMG-001', 5]], 'discount' => 0, 'payment' => 330000],
-            ['days_ago' => 3, 'hour' => 8, 'minute' => 55, 'items' => [['DLX-045', 1], ['CAT-102', 1]], 'discount' => 20000, 'payment' => 450000],
-            ['days_ago' => 4, 'hour' => 13, 'minute' => 15, 'items' => [['PVC-004', 10]], 'discount' => 5000, 'payment' => 350000],
-            ['days_ago' => 5, 'hour' => 12, 'minute' => 5, 'items' => [['BES-010', 4], ['PKU-050', 2]], 'discount' => 0, 'payment' => 380000],
-            ['days_ago' => 6, 'hour' => 10, 'minute' => 45, 'items' => [['TRP-005', 3]], 'discount' => 0, 'payment' => 450000],
-            ['days_ago' => 7, 'hour' => 15, 'minute' => 35, 'items' => [['SMN-001', 4], ['PVC-088', 1]], 'discount' => 10000, 'payment' => 360000],
-            ['days_ago' => 8, 'hour' => 9, 'minute' => 50, 'items' => [['SMG-001', 6], ['PKU-050', 4]], 'discount' => 20000, 'payment' => 500000],
-            ['days_ago' => 9, 'hour' => 14, 'minute' => 0, 'items' => [['CAT-102', 2], ['PVC-004', 3]], 'discount' => 10000, 'payment' => 420000],
-        ])->values()->each(function (array $saleData, int $index) use ($items, $admin) {
-            $soldAt = $this->makeDate($saleData['days_ago'], $saleData['hour'], $saleData['minute']);
+        return $admin->fresh();
+    }
 
-            $lineItems = collect($saleData['items'])->map(function (array $entry) use ($items) {
-                [$sku, $quantity] = $entry;
-                $item = $items[$sku];
+    private function seedGoodsReceipts(Collection $items, Supplier $supplier): void
+    {
+        $items
+            ->values()
+            ->filter(fn (InventoryItem $item, int $index) => $item->price > 0 && ($index < 12 || $index % 7 === 0))
+            ->take(24)
+            ->values()
+            ->each(function (InventoryItem $item, int $index) use ($supplier) {
+                GoodsReceipt::query()->create([
+                    'inventory_item_id' => $item->id,
+                    'supplier_id' => $supplier->id,
+                    'quantity' => $this->deriveRestockQuantity($item, $index),
+                    'unit_cost' => $this->baseCost($item),
+                    'received_at' => Carbon::now()->subDays(($index % 12) + 1)->setTime(8 + ($index % 5), 0),
+                    'note' => "Restock awal {$item->category} berdasarkan dataset Excel.",
+                ]);
+            });
+    }
 
-                return [
+    private function seedSales(Collection $items, User $admin): void
+    {
+        $candidates = $items
+            ->values()
+            ->filter(fn (InventoryItem $item) => $item->price > 0 && (float) $item->stock > (float) $item->min_stock)
+            ->values();
+
+        if ($candidates->isEmpty()) {
+            return;
+        }
+
+        $daysAgo = [0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+        $dateCounters = [];
+
+        foreach ($daysAgo as $index => $day) {
+            $soldAt = Carbon::now()->subDays($day)->setTime(8 + ($index % 9), ($index * 10) % 60);
+            $itemCount = 1 + ($index % 3);
+            $usedIds = [];
+            $lineItems = collect();
+
+            for ($offset = 0; $offset < $itemCount; $offset += 1) {
+                /** @var InventoryItem $item */
+                $item = $candidates->get(($index * 7 + $offset * 13) % $candidates->count());
+
+                if (! $item || in_array($item->id, $usedIds, true)) {
+                    continue;
+                }
+
+                $usedIds[] = $item->id;
+                $quantity = $this->deriveSaleQuantity($item, $index + $offset);
+                $lineTotal = (int) round($item->price * $quantity);
+
+                $lineItems->push([
                     'inventory_item_id' => $item->id,
                     'sku' => $item->sku,
                     'item_name' => $item->name,
@@ -260,34 +155,166 @@ class PosDemoSeederService
                     'unit' => $item->unit,
                     'quantity' => $quantity,
                     'unit_price' => $item->price,
-                    'line_total' => (int) round($item->price * $quantity),
-                ];
-            });
+                    'line_total' => $lineTotal,
+                ]);
+            }
 
-            $subtotal = $lineItems->sum('line_total');
-            $total = $subtotal - $saleData['discount'];
+            $subtotal = (int) $lineItems->sum('line_total');
+
+            if ($lineItems->isEmpty() || $subtotal <= 0) {
+                continue;
+            }
+
+            $discount = $subtotal > 250000 && $index % 3 === 0
+                ? $this->roundToNearest(min($subtotal * 0.03, 25000), 1000)
+                : 0;
+            $total = max(0, $subtotal - $discount);
+            $payment = $this->roundUpTo($total, 10000);
 
             $sale = Sale::query()->create([
-                'invoice_number' => sprintf('TR-%s-%03d', $soldAt->format('ymd'), $index + 1),
+                'invoice_number' => $this->seedInvoiceNumber($soldAt, $dateCounters),
                 'user_id' => $admin->id,
                 'subtotal' => $subtotal,
-                'discount' => $saleData['discount'],
+                'discount' => $discount,
                 'total' => $total,
-                'payment_amount' => max($saleData['payment'], $total),
-                'change_amount' => max($saleData['payment'], $total) - $total,
+                'payment_amount' => $payment,
+                'change_amount' => $payment - $total,
                 'sold_at' => $soldAt,
             ]);
 
             $sale->items()->createMany($lineItems->all());
-        });
-
-        return $admin->fresh();
+        }
     }
 
-    private function makeDate(int $daysAgo, int $hour, int $minute = 0): Carbon
+    private function deriveSeedStock(array $item, int $index): float
     {
-        return now()
-            ->subDays($daysAgo)
-            ->setTime($hour, $minute);
+        $price = (int) ($item['price'] ?? 0);
+        $unit = strtolower((string) ($item['unit'] ?? ''));
+        $stock = 20 + ($index % 14) * 2;
+
+        if (str_contains($unit, 'kg')) {
+            $stock = 12 + ($index % 8) * 2;
+        } elseif (str_contains($unit, 'sak')) {
+            $stock = 10 + ($index % 6) * 3;
+        } elseif (str_contains($unit, 'btg')) {
+            $stock = 16 + ($index % 10) * 3;
+        } elseif (str_contains($unit, 'roll')) {
+            $stock = 8 + ($index % 6) * 2;
+        } elseif (str_contains($unit, 'lembar')) {
+            $stock = 14 + ($index % 7) * 3;
+        }
+
+        if ($price >= 1000000) {
+            $stock = max(2, (int) round($stock * 0.25));
+        } elseif ($price >= 500000) {
+            $stock = max(3, (int) round($stock * 0.35));
+        } elseif ($price >= 200000) {
+            $stock = max(5, (int) round($stock * 0.55));
+        }
+
+        if (($index + 1) % 17 === 0) {
+            $stock = max(1, min($stock, 3));
+        }
+
+        return (float) $stock;
+    }
+
+    private function deriveSeedMinStock(array $item, int $index, float $stock): float
+    {
+        $currentMinStock = (float) ($item['min_stock'] ?? 0);
+
+        if ($currentMinStock > 1) {
+            return $currentMinStock;
+        }
+
+        if (($index + 1) % 17 === 0) {
+            return max(2, $stock + 1);
+        }
+
+        return (float) max(1, min(12, (int) round($stock * 0.2)));
+    }
+
+    private function deriveRestockQuantity(InventoryItem $item, int $index): float
+    {
+        $unit = strtolower($item->unit);
+
+        if (str_contains($unit, 'kg')) {
+            return 5 + ($index % 5) * 2;
+        }
+
+        if (str_contains($unit, 'sak')) {
+            return 8 + ($index % 4) * 4;
+        }
+
+        if (str_contains($unit, 'roll')) {
+            return 4 + ($index % 4) * 2;
+        }
+
+        return 10 + ($index % 6) * 3;
+    }
+
+    private function deriveSaleQuantity(InventoryItem $item, int $seed): float
+    {
+        $unit = strtolower($item->unit);
+        $available = max(1, (int) floor((float) $item->stock - (float) $item->min_stock));
+        $quantity = 1 + ($seed % 3);
+
+        if (str_contains($unit, 'kg')) {
+            $quantity = [0.5, 1, 2][$seed % 3];
+        } elseif ($item->price >= 500000) {
+            $quantity = 1;
+        } elseif ($item->price < 25000) {
+            $quantity = 2 + ($seed % 5);
+        }
+
+        return (float) min($quantity, $available);
+    }
+
+    private function baseCost(InventoryItem $item): int
+    {
+        $basePrice = $this->priceTextFromDescription($item->description ?? '', 'Harga dasar');
+
+        return $basePrice > 0 ? $basePrice : (int) round($item->price * 0.85);
+    }
+
+    private function priceTextFromDescription(string $description, string $label): int
+    {
+        $marker = $label.':';
+        $start = stripos($description, $marker);
+
+        if ($start === false) {
+            return 0;
+        }
+
+        $tail = substr($description, $start + strlen($marker));
+        $end = strlen($tail);
+
+        foreach ([' | Harga dasar:', ' | Harga toko:', ' | Harga eceran:', ' | Sumber:'] as $separator) {
+            $position = stripos($tail, $separator);
+
+            if ($position !== false) {
+                $end = min($end, $position);
+            }
+        }
+
+        return (int) preg_replace('/\D+/', '', substr($tail, 0, $end));
+    }
+
+    private function seedInvoiceNumber(Carbon $soldAt, array &$dateCounters): string
+    {
+        $dateKey = $soldAt->format('ymd');
+        $dateCounters[$dateKey] = ($dateCounters[$dateKey] ?? 0) + 1;
+
+        return sprintf('TR-%s-%03d', $dateKey, $dateCounters[$dateKey]);
+    }
+
+    private function roundToNearest(int|float $value, int $step): int
+    {
+        return (int) (round($value / $step) * $step);
+    }
+
+    private function roundUpTo(int|float $value, int $step): int
+    {
+        return (int) (ceil($value / $step) * $step);
     }
 }

@@ -163,7 +163,7 @@ Kalau data testing sudah berubah-ubah dan ingin kembali ke kondisi awal:
 php artisan migrate:fresh --seed
 ```
 
-Atau dari aplikasi, login lalu gunakan tombol `Reset Demo`.
+Atau dari aplikasi, login lalu gunakan tombol `Reset Data`.
 
 ## 10. Catatan penting
 

@@ -267,7 +267,7 @@ class PosController extends Controller
         $request->session()->regenerate();
 
         return response()->json([
-            'message' => 'Data demo berhasil direset.',
+            'message' => 'Data stok, pemasukan, dan pengeluaran berhasil direset dari dataset Excel.',
             'state' => $bootstrapService->build($admin),
         ]);
     }

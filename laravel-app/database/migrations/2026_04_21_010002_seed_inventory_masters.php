@@ -10,39 +10,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        $categories = collect([
-            'Material Dasar',
-            'Finishing & Cat',
-            'Perkakas',
-            'Plumbing & Pipa',
-            'Struktur',
-            'Aksesoris',
-            'Listrik',
-        ])->merge(
-            DB::table('inventory_items')
-                ->select('category')
-                ->distinct()
-                ->pluck('category')
-        );
+        $categories = DB::table('inventory_items')
+            ->select('category')
+            ->distinct()
+            ->pluck('category');
 
-        $units = collect([
-            'pcs',
-            'kg',
-            'gram',
-            'sak',
-            'box',
-            'btg',
-            'lembar',
-            'kaleng',
-            'meter',
-            'liter',
-            'roll',
-        ])->merge(
-            DB::table('inventory_items')
-                ->select('unit')
-                ->distinct()
-                ->pluck('unit')
-        );
+        $units = DB::table('inventory_items')
+            ->select('unit')
+            ->distinct()
+            ->pluck('unit');
 
         $this->insertMasterNames('inventory_categories', $categories);
         $this->insertMasterNames('inventory_units', $units);

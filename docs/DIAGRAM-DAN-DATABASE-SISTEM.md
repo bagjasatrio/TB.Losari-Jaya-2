@@ -92,7 +92,7 @@ flowchart TD
     Pilih -- Laporan --> Laporan --> Export --> Dashboard
     Pilih -- Keuangan --> Keuangan --> Dashboard
     Pilih -- Detail Transaksi --> Detail --> Dashboard
-    Pilih -- Reset Demo --> Reset --> Dashboard
+    Pilih -- Reset Data --> Reset --> Dashboard
     Pilih -- Logout --> Logout --> End
 ```
 
@@ -580,4 +580,3 @@ CREATE TABLE sale_items (
 | `goods_receipts` | Menyimpan transaksi barang masuk atau restock. |
 | `sales` | Menyimpan header transaksi penjualan, total, pembayaran, dan kembalian. |
 | `sale_items` | Menyimpan rincian item pada setiap transaksi penjualan. |
-
