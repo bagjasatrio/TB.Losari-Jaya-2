@@ -2,12 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\InventoryItem;
+use App\Models\Customer;
+use App\Models\DebtPayment;
+use App\Models\GoodsReceipt;
 use App\Models\InventoryCategory;
+use App\Models\InventoryItem;
 use App\Models\InventoryUnit;
+use App\Models\ReturnRequest;
 use App\Models\Sale;
+use App\Models\SaleItem;
+use App\Models\StockOpname;
 use App\Models\Supplier;
 use App\Models\User;
+use App\Models\VoidLog;
 use App\Services\PosBootstrapService;
 use App\Services\PosDemoSeederService;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -18,6 +25,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class PosController extends Controller
@@ -42,6 +50,18 @@ class PosController extends Controller
                 'reset' => route('pos.reset'),
                 'reportPdf' => route('pos.reports.pdf'),
                 'usersStore' => route('pos.users.store'),
+                'usersBase' => url('/users'),
+                'changePassword' => route('pos.password.change'),
+                'voidBase' => url('/sales'),
+                'voidHistory' => route('pos.void.history'),
+                'returnsStore' => route('pos.returns.store'),
+                'returnsHistory' => route('pos.returns.history'),
+                'opnamesStore' => route('pos.opnames.store'),
+                'opnamesHistory' => route('pos.opnames.history'),
+                'customersStore' => route('pos.customers.store'),
+                'customersBase' => url('/customers'),
+                'debtStore' => route('pos.debt.store'),
+                'debtBase' => url('/debt-payments'),
             ],
         ]);
     }
@@ -62,6 +82,7 @@ class PosController extends Controller
             return response()->json([
                 'message' => 'Login berhasil.',
                 'state' => $bootstrapService->build($request->user()),
+                'csrfToken' => csrf_token(),
             ]);
         }
 
@@ -85,6 +106,7 @@ class PosController extends Controller
     {
         return response()->json([
             'state' => $bootstrapService->build($request->user()),
+            'csrfToken' => csrf_token(),
         ]);
     }
 
@@ -105,6 +127,7 @@ class PosController extends Controller
             'stock' => $data['stock'],
             'min_stock' => $data['minStock'],
             'price' => $data['price'],
+            'purchase_price' => $data['purchasePrice'] ?? 0,
             'description' => $data['description'],
         ]);
 
@@ -131,6 +154,7 @@ class PosController extends Controller
             'stock' => $data['stock'],
             'min_stock' => $data['minStock'],
             'price' => $data['price'],
+            'purchase_price' => $data['purchasePrice'] ?? $item->purchase_price ?? 0,
             'description' => $data['description'],
         ]);
 
@@ -183,6 +207,10 @@ class PosController extends Controller
             ]);
         });
 
+        // Recalculate weighted average purchase price
+        $item = InventoryItem::query()->findOrFail($data['itemId']);
+        $this->recalculatePurchasePrice($item);
+
         return response()->json([
             'message' => 'Barang masuk berhasil dicatat.',
             'state' => $bootstrapService->build($request->user()),
@@ -197,59 +225,120 @@ class PosController extends Controller
             'items.*.quantity' => ['required', 'numeric', 'min:0.001'],
             'discount' => ['required', 'integer', 'min:0'],
             'payment' => ['required', 'integer', 'min:0'],
+            'paymentMethod' => ['required', 'string', 'in:tunai,qris,va,hutang'],
+            'paymentProof' => ['nullable', 'string'],
+            'customerName' => ['nullable', 'string', 'max:255'],
+            'customerPhone' => ['nullable', 'string', 'max:20'],
+            'customerAddress' => ['nullable', 'string', 'max:1000'],
+            'dp' => ['nullable', 'integer', 'min:0'],
+        ], [
+            'paymentMethod.required' => 'Metode pembayaran wajib dipilih.',
+            'paymentMethod.in' => 'Metode pembayaran tidak valid.',
         ]);
 
-        DB::transaction(function () use ($data, $request) {
-            $soldAt = now();
-            $lineItems = collect($data['items'])->map(function (array $line) {
-                $item = InventoryItem::query()->lockForUpdate()->findOrFail($line['itemId']);
+        $soldAt = now();
+        $paymentMethod = $data['paymentMethod'];
 
-                $quantity = (float) $line['quantity'];
+        if ($paymentMethod === 'hutang' && empty($data['customerName'])) {
+            return response()->json(['message' => 'Nama pelanggan wajib diisi untuk transaksi hutang.'], 422);
+        }
 
-                if ($quantity > (float) $item->stock) {
-                    abort(response()->json([
-                        'message' => "Stok {$item->name} tidak mencukupi.",
-                    ], 422));
+        // Resolve or auto-create customer for hutang
+        $customerId = null;
+        $customerName = null;
+        if (! empty($data['customerName'])) {
+            $customerData = ['name' => trim($data['customerName'])];
+            if (! empty($data['customerPhone'])) {
+                $customerData['phone'] = trim($data['customerPhone']);
+            }
+            if (! empty($data['customerAddress'])) {
+                $customerData['address'] = trim($data['customerAddress']);
+            }
+            $customer = Customer::query()
+                ->whereRaw('LOWER(name) = ?', [mb_strtolower(trim($data['customerName']))])
+                ->first();
+            if ($customer) {
+                if (! empty($data['customerPhone']) || ! empty($data['customerAddress'])) {
+                    $customer->update($customerData);
                 }
+            } else {
+                $customer = Customer::query()->create($customerData);
+            }
+            $customerId = $customer->id;
+            $customerName = $customer->name;
+        }
 
-                $item->update([
-                    'stock' => (float) $item->stock - $quantity,
-                ]);
+        // Store proof image if provided
+        $proofPath = null;
+        if (! empty($data['paymentProof'])) {
+            $proofPath = $this->storeProofImage($data['paymentProof']);
+        }
 
-                return [
-                    'inventory_item_id' => $item->id,
-                    'sku' => $item->sku,
-                    'item_name' => $item->name,
-                    'category' => $item->category,
-                    'unit' => $item->unit,
-                    'quantity' => $quantity,
-                    'unit_price' => $item->price,
-                    'line_total' => (int) round($item->price * $quantity),
-                ];
-            });
+        $lineItems = collect($data['items'])->map(function (array $line) {
+            $item = InventoryItem::query()->lockForUpdate()->findOrFail($line['itemId']);
+            $quantity = (float) $line['quantity'];
 
-            $subtotal = $lineItems->sum('line_total');
-            $discount = min($data['discount'], $subtotal);
-            $total = $subtotal - $discount;
-
-            if ($data['payment'] < $total) {
+            if ($quantity > (float) $item->stock) {
                 abort(response()->json([
-                    'message' => 'Nominal pembayaran kurang dari total tagihan.',
+                    'message' => "Stok {$item->name} tidak mencukupi.",
                 ], 422));
             }
 
+            $item->update([
+                'stock' => (float) $item->stock - $quantity,
+            ]);
+
+            return [
+                'item' => $item,
+                'inventory_item_id' => $item->id,
+                'sku' => $item->sku,
+                'item_name' => $item->name,
+                'category' => $item->category,
+                'unit' => $item->unit,
+                'quantity' => $quantity,
+                'unit_price' => $item->price,
+                'line_total' => (int) round($item->price * $quantity),
+            ];
+        });
+
+        $subtotal = $lineItems->sum('line_total');
+        $discount = min($data['discount'], $subtotal);
+        $total = $subtotal - $discount;
+
+        if ($paymentMethod === 'tunai' && $data['payment'] < $total) {
+            abort(response()->json([
+                'message' => 'Nominal pembayaran kurang dari total tagihan.',
+            ], 422));
+        }
+
+        if ($paymentMethod === 'hutang') {
+            $dp = min((int) ($data['dp'] ?? 0), $total);
+            $paymentAmount = $dp;
+            $changeAmount = 0;
+        } else {
+            $paymentAmount = $paymentMethod === 'tunai' ? $data['payment'] : $total;
+            $changeAmount = $paymentMethod === 'tunai' ? $data['payment'] - $total : 0;
+        }
+
+        $saleItems = $lineItems->map(fn ($li) => collect($li)->except('item')->all())->all();
+
+        DB::transaction(function () use ($saleItems, $request, $soldAt, $subtotal, $discount, $total, $paymentMethod, $paymentAmount, $changeAmount, $proofPath, $customerId, $customerName) {
             $sale = Sale::query()->create([
                 'invoice_number' => $this->nextInvoiceNumber($soldAt),
                 'user_id' => $request->user()?->id,
+                'customer_id' => $customerId,
+                'customer_name' => $customerName,
                 'subtotal' => $subtotal,
                 'discount' => $discount,
                 'total' => $total,
-                'payment_amount' => $data['payment'],
-                'change_amount' => $data['payment'] - $total,
+                'payment_amount' => $paymentAmount,
+                'change_amount' => $changeAmount,
+                'payment_method' => $paymentMethod,
+                'payment_proof' => $proofPath,
                 'sold_at' => $soldAt,
             ]);
 
-            $sale->items()->createMany($lineItems->all());
+            $sale->items()->createMany($saleItems);
         });
 
         return response()->json([
@@ -269,6 +358,7 @@ class PosController extends Controller
         return response()->json([
             'message' => 'Data stok, pemasukan, dan pengeluaran berhasil direset dari dataset Excel.',
             'state' => $bootstrapService->build($admin),
+            'csrfToken' => csrf_token(),
         ]);
     }
 
@@ -396,6 +486,99 @@ class PosController extends Controller
         ]);
     }
 
+    public function updateUser(Request $request, User $user, PosBootstrapService $bootstrapService): JsonResponse
+    {
+        $this->ensureAdmin($request);
+
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'max:255', 'alpha_dash', Rule::unique('users', 'username')->ignore($user->id)],
+            'email' => ['nullable', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'role' => ['required', Rule::in([User::ROLE_ADMIN, User::ROLE_CASHIER])],
+            'password' => ['nullable', 'string', 'min:6'],
+        ], [
+            'name.required' => 'Nama pengguna wajib diisi.',
+            'username.required' => 'Username wajib diisi.',
+            'username.alpha_dash' => 'Username hanya boleh berisi huruf, angka, strip, dan garis bawah.',
+            'username.unique' => 'Username sudah digunakan.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email sudah digunakan.',
+            'role.required' => 'Role pengguna wajib dipilih.',
+            'password.min' => 'Password minimal 6 karakter.',
+        ]);
+
+        $updates = [
+            'name' => trim($data['name']),
+            'username' => strtolower(trim($data['username'])),
+            'role' => $data['role'],
+            'email' => ($data['email'] ?? null) ?: strtolower(trim($data['username'])).'@tb-losari-jaya.local',
+        ];
+
+        if (! empty($data['password'])) {
+            $updates['password'] = Hash::make($data['password']);
+        }
+
+        $user->update($updates);
+
+        return response()->json([
+            'message' => 'User berhasil diperbarui.',
+            'state' => $bootstrapService->build($request->user()),
+        ]);
+    }
+
+    public function destroyUser(Request $request, User $user, PosBootstrapService $bootstrapService): JsonResponse
+    {
+        $this->ensureAdmin($request);
+
+        if ($user->id === $request->user()?->id) {
+            return response()->json([
+                'message' => 'Tidak bisa menghapus akun sendiri.',
+            ], 422);
+        }
+
+        $user->delete();
+
+        return response()->json([
+            'message' => 'User berhasil dihapus.',
+            'state' => $bootstrapService->build($request->user()),
+        ]);
+    }
+
+    public function changePassword(Request $request, PosBootstrapService $bootstrapService): JsonResponse
+    {
+        $data = $request->validate([
+            'current_password' => ['required', 'string'],
+            'new_password' => ['required', 'string', 'min:6'],
+            'confirm_password' => ['required', 'string', 'same:new_password'],
+        ], [
+            'current_password.required' => 'Password saat ini wajib diisi.',
+            'new_password.required' => 'Password baru wajib diisi.',
+            'new_password.min' => 'Password baru minimal 6 karakter.',
+            'confirm_password.required' => 'Konfirmasi password wajib diisi.',
+            'confirm_password.same' => 'Konfirmasi password tidak cocok.',
+        ]);
+
+        $user = $request->user();
+        if (! $user) {
+            return response()->json(['message' => 'Sesi tidak ditemukan.'], 401);
+        }
+
+        if (! Hash::check($data['current_password'], $user->password)) {
+            return response()->json([
+                'message' => 'Password saat ini tidak sesuai.',
+            ], 422);
+        }
+
+        $user->update([
+            'password' => Hash::make($data['new_password']),
+        ]);
+
+        return response()->json([
+            'message' => 'Password berhasil diubah.',
+            'state' => $bootstrapService->build($request->user()),
+        ]);
+    }
+
     public function reportPdf(Request $request)
     {
         $this->ensureAdmin($request);
@@ -410,6 +593,379 @@ class PosController extends Controller
         return $pdf->download($payload['filename']);
     }
 
+    public function voidSale(Request $request, Sale $sale, PosBootstrapService $bootstrapService): JsonResponse
+    {
+        $this->ensureAdmin($request);
+
+        $data = $request->validate([
+            'reason' => ['required', 'string', 'max:1000'],
+        ], [
+            'reason.required' => 'Alasan pembatalan wajib diisi.',
+            'reason.max' => 'Alasan pembatalan maksimal 1000 karakter.',
+        ]);
+
+        if ($sale->status === 'void') {
+            return response()->json([
+                'message' => 'Transaksi ini sudah dibatalkan sebelumnya.',
+            ], 422);
+        }
+
+        DB::transaction(function () use ($sale, $data, $request) {
+            $sale->load('items');
+
+            $restoredItems = $sale->items->map(function (SaleItem $line) {
+                $item = InventoryItem::query()->lockForUpdate()->findOrFail($line->inventory_item_id);
+                $stockBefore = (float) $item->stock;
+
+                $item->update([
+                    'stock' => $stockBefore + (float) $line->quantity,
+                ]);
+
+                return [
+                    'item_id' => $item->id,
+                    'item_name' => $item->name,
+                    'quantity' => (float) $line->quantity,
+                    'stock_before' => $stockBefore,
+                    'stock_after' => (float) $item->fresh()->stock,
+                ];
+            });
+
+            $sale->update([
+                'status' => 'void',
+                'void_reason' => trim($data['reason']),
+                'voided_by' => $request->user()?->id,
+                'voided_at' => now(),
+            ]);
+
+            $sale->voidLog()->create([
+                'user_id' => $request->user()?->id,
+                'reason' => trim($data['reason']),
+                'restored_items' => $restoredItems->all(),
+            ]);
+        });
+
+        return response()->json([
+            'message' => 'Transaksi berhasil dibatalkan. Stok barang sudah dikembalikan.',
+            'state' => $bootstrapService->build($request->user()),
+        ]);
+    }
+
+    public function voidHistory(Request $request, PosBootstrapService $bootstrapService): JsonResponse
+    {
+        $this->ensureAdmin($request);
+
+        $voidLogs = VoidLog::query()
+            ->with(['sale', 'user'])
+            ->latest()
+            ->get()
+            ->map(function (VoidLog $log) {
+                return [
+                    'id' => $log->id,
+                    'saleId' => $log->sale?->invoice_number,
+                    'saleTotal' => (int) ($log->sale?->total ?? 0),
+                    'soldAt' => $log->sale?->sold_at?->toIso8601String(),
+                    'voidedBy' => $log->user?->name ?? '-',
+                    'reason' => $log->reason,
+                    'restoredItems' => $log->restored_items,
+                    'createdAt' => $log->created_at?->toIso8601String(),
+                ];
+            })
+            ->values()
+            ->all();
+
+        return response()->json([
+            'voidLogs' => $voidLogs,
+        ]);
+    }
+
+    public function storeReturn(Request $request, PosBootstrapService $bootstrapService): JsonResponse
+    {
+        $this->ensureAdmin($request);
+
+        $data = $request->validate([
+            'saleId' => ['required', 'integer', 'exists:sales,id'],
+            'reason' => ['required', 'string', 'max:1000'],
+            'items' => ['required', 'array', 'min:1'],
+            'items.*.itemId' => ['required', 'integer', 'exists:inventory_items,id'],
+            'items.*.quantity' => ['required', 'numeric', 'min:0.001'],
+        ], [
+            'reason.required' => 'Alasan retur wajib diisi.',
+            'items.required' => 'Pilih minimal satu barang yang diretur.',
+            'items.min' => 'Pilih minimal satu barang yang diretur.',
+        ]);
+
+        DB::transaction(function () use ($data, $request) {
+            $sale = Sale::query()->with('items')->findOrFail($data['saleId']);
+
+            if ($sale->status === 'void') {
+                abort(response()->json([
+                    'message' => 'Transaksi ini sudah dibatalkan (void) dan tidak bisa diretur.',
+                ], 422));
+            }
+
+            // Load previous returns to calculate remaining available quantity per item
+            $previousReturns = $sale->returnRequests()
+                ->with('items')
+                ->get();
+
+            $returnItems = [];
+            $totalRefund = 0;
+
+            foreach ($data['items'] as $line) {
+                $invItem = InventoryItem::query()->lockForUpdate()->findOrFail($line['itemId']);
+
+                $saleItem = $sale->items->firstWhere('inventory_item_id', $line['itemId']);
+                if (! $saleItem) {
+                    abort(response()->json([
+                        'message' => "Barang {$invItem->name} tidak ditemukan dalam transaksi ini.",
+                    ], 422));
+                }
+
+                $qtyReturned = (float) $line['quantity'];
+                $qtySold = (float) $saleItem->quantity;
+
+                // Calculate already returned quantity for this item across all previous returns
+                $alreadyReturned = $previousReturns->sum(fn ($ret) => $ret->items->where('inventory_item_id', $line['itemId'])->sum('quantity_returned')
+                );
+                $remaining = $qtySold - $alreadyReturned;
+
+                if ($qtyReturned > $remaining) {
+                    $availableText = $this->quantity(max($remaining, 0));
+                    abort(response()->json([
+                        'message' => "Jumlah retur {$invItem->name} melebihi sisa yang bisa diretur ({$availableText}).",
+                    ], 422));
+                }
+
+                // Check if this item was already fully returned
+                if ($remaining <= 0) {
+                    abort(response()->json([
+                        'message' => "{$invItem->name} sudah diretur semua dan tidak bisa diretur lagi.",
+                    ], 422));
+                }
+
+                // Restore stock
+                $invItem->update([
+                    'stock' => (float) $invItem->stock + $qtyReturned,
+                ]);
+
+                $refund = (int) round($saleItem->unit_price * $qtyReturned);
+                $totalRefund += $refund;
+
+                $returnItems[] = [
+                    'inventory_item_id' => $invItem->id,
+                    'item_name' => $invItem->name,
+                    'sku' => $invItem->sku,
+                    'unit' => $invItem->unit,
+                    'quantity_returned' => $qtyReturned,
+                    'unit_price' => (int) $saleItem->unit_price,
+                    'refund_amount' => $refund,
+                ];
+            }
+
+            // Check if ALL items across ALL returns now equal the original sale
+            $totalAlreadyReturned = $previousReturns->sum(fn ($ret) => $ret->items->sum('quantity_returned'));
+            $totalSold = $sale->items->sum('quantity');
+            $totalNowReturned = collect($returnItems)->sum('quantity_returned');
+            $isFullReturn = ($totalAlreadyReturned + $totalNowReturned) >= $totalSold;
+
+            $returnRequest = $sale->returnRequests()->create([
+                'invoice_number' => $this->nextReturnInvoiceNumber(),
+                'reason' => trim($data['reason']),
+                'total_refund' => $totalRefund,
+                'status' => $isFullReturn ? 'full' : 'partial',
+                'created_by' => $request->user()?->id,
+            ]);
+
+            $returnRequest->items()->createMany($returnItems);
+
+            // Update sale status to reflect return
+            $sale->update([
+                'status' => $isFullReturn ? 'returned' : 'partial_return',
+            ]);
+        });
+
+        return response()->json([
+            'message' => 'Retur berhasil diproses. Stok barang sudah dikembalikan.',
+            'state' => $bootstrapService->build($request->user()),
+        ]);
+    }
+
+    public function returnHistory(Request $request, PosBootstrapService $bootstrapService): JsonResponse
+    {
+        $this->ensureAdmin($request);
+
+        $returns = ReturnRequest::query()
+            ->with(['sale', 'creator', 'items'])
+            ->latest()
+            ->get()
+            ->map(function (ReturnRequest $return) {
+                return [
+                    'id' => $return->id,
+                    'invoiceNumber' => $return->invoice_number,
+                    'saleId' => $return->sale?->invoice_number,
+                    'saleDate' => $return->sale?->sold_at?->toIso8601String(),
+                    'reason' => $return->reason,
+                    'totalRefund' => (int) $return->total_refund,
+                    'status' => $return->status,
+                    'isVoided' => (bool) $return->is_voided,
+                    'createdBy' => $return->creator?->name ?? '-',
+                    'items' => $return->items->map(fn ($item) => [
+                        'itemId' => $item->inventory_item_id,
+                        'itemName' => $item->item_name,
+                        'sku' => $item->sku,
+                        'unit' => $item->unit,
+                        'quantity' => (float) $item->quantity_returned,
+                        'unitPrice' => (int) $item->unit_price,
+                        'refundAmount' => (int) $item->refund_amount,
+                    ])->values()->all(),
+                    'createdAt' => $return->created_at?->toIso8601String(),
+                ];
+            })
+            ->values()
+            ->all();
+
+        return response()->json([
+            'returns' => $returns,
+        ]);
+    }
+
+    public function storeOpname(Request $request, PosBootstrapService $bootstrapService): JsonResponse
+    {
+        $this->ensureAdmin($request);
+
+        $data = $request->validate([
+            'items' => ['required', 'array', 'min:1'],
+            'items.*.itemId' => ['required', 'integer', 'exists:inventory_items,id'],
+            'items.*.actualStock' => ['required', 'numeric', 'min:0'],
+            'notes' => ['nullable', 'string', 'max:1000'],
+        ], [
+            'items.required' => 'Data barang opname wajib diisi.',
+            'items.min' => 'Pilih minimal satu barang untuk diopname.',
+        ]);
+
+        $opnameNumber = $this->nextOpnameNumber();
+
+        DB::transaction(function () use ($data, $request, $opnameNumber) {
+            $items = collect($data['items'])->mapWithKeys(fn ($line) => [
+                $line['itemId'] => $line,
+            ]);
+
+            $inventoryItems = InventoryItem::query()
+                ->whereIn('id', $items->keys())
+                ->lockForUpdate()
+                ->get()
+                ->keyBy('id');
+
+            $opnameItems = [];
+            $discrepancyCount = 0;
+            $totalAdjustment = 0;
+
+            foreach ($items as $itemId => $line) {
+                $invItem = $inventoryItems->get($itemId);
+                if (! $invItem) {
+                    abort(response()->json([
+                        'message' => "Barang dengan ID {$itemId} tidak ditemukan.",
+                    ], 422));
+                }
+
+                $systemStock = (float) $invItem->stock;
+                $actualStock = (float) $line['actualStock'];
+                $difference = round($actualStock - $systemStock, 3);
+
+                if (abs($difference) > 0.001) {
+                    $discrepancyCount++;
+                    $totalAdjustment += (int) round($difference * (int) $invItem->price);
+
+                    $invItem->update([
+                        'stock' => $actualStock,
+                    ]);
+                }
+
+                $opnameItems[] = [
+                    'inventory_item_id' => $invItem->id,
+                    'system_stock' => $systemStock,
+                    'actual_stock' => $actualStock,
+                    'difference' => $difference,
+                    'unit_price' => (int) $invItem->price,
+                ];
+            }
+
+            $opname = StockOpname::query()->create([
+                'opname_number' => $opnameNumber,
+                'notes' => trim($data['notes'] ?? ''),
+                'status' => 'completed',
+                'total_items' => count($opnameItems),
+                'total_discrepancy_items' => $discrepancyCount,
+                'total_adjustment' => $totalAdjustment,
+                'created_by' => $request->user()?->id,
+                'completed_at' => now(),
+            ]);
+
+            $opname->items()->createMany($opnameItems);
+        });
+
+        return response()->json([
+            'message' => 'Stok opname berhasil diproses. Stok barang sudah disesuaikan.',
+            'state' => $bootstrapService->build($request->user()),
+        ]);
+    }
+
+    public function opnameHistory(Request $request, PosBootstrapService $bootstrapService): JsonResponse
+    {
+        $this->ensureAdmin($request);
+
+        $opnames = StockOpname::query()
+            ->with('creator')
+            ->latest()
+            ->get()
+            ->map(function (StockOpname $opname) {
+                return [
+                    'id' => $opname->id,
+                    'opnameNumber' => $opname->opname_number,
+                    'notes' => $opname->notes,
+                    'status' => $opname->status,
+                    'totalItems' => (int) $opname->total_items,
+                    'discrepancyItems' => (int) $opname->total_discrepancy_items,
+                    'totalAdjustment' => (int) $opname->total_adjustment,
+                    'createdBy' => $opname->creator?->name ?? '-',
+                    'completedAt' => $opname->completed_at?->toIso8601String(),
+                    'createdAt' => $opname->created_at?->toIso8601String(),
+                ];
+            })
+            ->values()
+            ->all();
+
+        return response()->json([
+            'opnames' => $opnames,
+        ]);
+    }
+
+    private function nextReturnInvoiceNumber(): string
+    {
+        $prefix = 'RR-'.now()->format('ymd').'-';
+        $last = ReturnRequest::query()
+            ->where('invoice_number', 'like', $prefix.'%')
+            ->orderBy('invoice_number', 'desc')
+            ->value('invoice_number');
+
+        $next = $last ? (int) substr($last, -3) + 1 : 1;
+
+        return $prefix.str_pad((string) $next, 3, '0', STR_PAD_LEFT);
+    }
+
+    private function nextOpnameNumber(): string
+    {
+        $prefix = 'SO-'.now()->format('ymd').'-';
+        $last = StockOpname::query()
+            ->where('opname_number', 'like', $prefix.'%')
+            ->orderBy('opname_number', 'desc')
+            ->value('opname_number');
+
+        $next = $last ? (int) substr($last, -3) + 1 : 1;
+
+        return $prefix.str_pad((string) $next, 3, '0', STR_PAD_LEFT);
+    }
+
     private function validateItemPayload(Request $request, ?InventoryItem $item = null): array
     {
         return $request->validate([
@@ -421,6 +977,7 @@ class PosController extends Controller
             'stock' => ['required', 'numeric', 'min:0'],
             'minStock' => ['required', 'numeric', 'min:0'],
             'price' => ['required', 'integer', 'min:0'],
+            'purchasePrice' => ['nullable', 'integer', 'min:0'],
             'description' => ['nullable', 'string'],
         ]);
     }
@@ -461,6 +1018,162 @@ class PosController extends Controller
         InventoryUnit::query()->firstOrCreate([
             'name' => trim($unit),
         ]);
+    }
+
+    private function recalculatePurchasePrice(InventoryItem $item): void
+    {
+        $avg = GoodsReceipt::query()
+            ->where('inventory_item_id', $item->id)
+            ->selectRaw('SUM(quantity * unit_cost) / SUM(quantity) as avg_cost')
+            ->value('avg_cost');
+
+        $item->update([
+            'purchase_price' => $avg ? (int) round((float) $avg) : 0,
+        ]);
+    }
+
+    // ── Customer Management ──
+
+    public function storeCustomer(Request $request, PosBootstrapService $bootstrapService): JsonResponse
+    {
+        $this->ensureAdmin($request);
+
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'address' => ['nullable', 'string', 'max:1000'],
+            'notes' => ['nullable', 'string', 'max:1000'],
+        ], [
+            'name.required' => 'Nama pelanggan wajib diisi.',
+        ]);
+
+        Customer::query()->create($data);
+
+        return response()->json([
+            'message' => 'Pelanggan berhasil ditambahkan.',
+            'state' => $bootstrapService->build($request->user()),
+        ]);
+    }
+
+    public function updateCustomer(Request $request, Customer $customer, PosBootstrapService $bootstrapService): JsonResponse
+    {
+        $this->ensureAdmin($request);
+
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'address' => ['nullable', 'string', 'max:1000'],
+            'notes' => ['nullable', 'string', 'max:1000'],
+        ], [
+            'name.required' => 'Nama pelanggan wajib diisi.',
+        ]);
+
+        $customer->update($data);
+
+        return response()->json([
+            'message' => 'Data pelanggan berhasil diperbarui.',
+            'state' => $bootstrapService->build($request->user()),
+        ]);
+    }
+
+    public function destroyCustomer(Request $request, Customer $customer, PosBootstrapService $bootstrapService): JsonResponse
+    {
+        $this->ensureAdmin($request);
+
+        $customer->delete();
+
+        return response()->json([
+            'message' => 'Pelanggan berhasil dihapus.',
+            'state' => $bootstrapService->build($request->user()),
+        ]);
+    }
+
+    // ── Debt Payments ──
+
+    public function storeDebtPayment(Request $request, PosBootstrapService $bootstrapService): JsonResponse
+    {
+        $this->ensureAdmin($request);
+
+        $data = $request->validate([
+            'saleId' => ['required', 'integer', 'exists:sales,id'],
+            'amount' => ['required', 'integer', 'min:1'],
+            'note' => ['nullable', 'string', 'max:500'],
+            'paidAt' => ['required', 'date'],
+        ], [
+            'saleId.required' => 'Transaksi wajib dipilih.',
+            'amount.required' => 'Jumlah bayar wajib diisi.',
+            'amount.min' => 'Jumlah bayar minimal Rp 1.',
+            'paidAt.required' => 'Tanggal bayar wajib diisi.',
+        ]);
+
+        $sale = Sale::query()->with('debtPayments')->findOrFail($data['saleId']);
+
+        if ($sale->payment_method !== 'hutang') {
+            return response()->json(['message' => 'Transaksi ini bukan transaksi hutang.'], 422);
+        }
+
+        $alreadyPaid = (int) $sale->debtPayments->sum('amount');
+        $remaining = (int) $sale->total - (int) $sale->payment_amount - $alreadyPaid;
+
+        if ($data['amount'] > $remaining) {
+            return response()->json([
+                'message' => "Jumlah melebihi sisa hutang (".number_format($remaining, 0, ',', '.').").",
+            ], 422);
+        }
+
+        DebtPayment::query()->create([
+            'customer_id' => $sale->customer_id,
+            'sale_id' => $sale->id,
+            'amount' => $data['amount'],
+            'note' => $data['note'] ?? null,
+            'paid_at' => $data['paidAt'],
+            'recorded_by' => $request->user()?->id,
+        ]);
+
+        return response()->json([
+            'message' => 'Pembayaran hutang berhasil dicatat.',
+            'state' => $bootstrapService->build($request->user()),
+        ]);
+    }
+
+    public function destroyDebtPayment(Request $request, DebtPayment $debtPayment, PosBootstrapService $bootstrapService): JsonResponse
+    {
+        $this->ensureAdmin($request);
+
+        $debtPayment->delete();
+
+        return response()->json([
+            'message' => 'Catatan pembayaran berhasil dihapus.',
+            'state' => $bootstrapService->build($request->user()),
+        ]);
+    }
+
+    private function storeProofImage(string $dataUrl): ?string
+    {
+        // Strip data URL header: "data:image/jpeg;base64,..."
+        if (str_contains($dataUrl, ',')) {
+            [, $base64] = explode(',', $dataUrl, 2);
+        } else {
+            $base64 = $dataUrl;
+        }
+
+        $bytes = base64_decode($base64, true);
+        if ($bytes === false || strlen($bytes) > 300 * 1024) {
+            return null;
+        }
+
+        // Detect extension from data URL mime type
+        $ext = 'jpg';
+        if (str_contains($dataUrl, 'image/png')) {
+            $ext = 'png';
+        } elseif (str_contains($dataUrl, 'image/webp')) {
+            $ext = 'webp';
+        }
+
+        $filename = 'proof_' . uniqid('', true) . '.' . $ext;
+        Storage::disk('public')->put('payment-proofs/' . $filename, $bytes);
+
+        return 'payment-proofs/' . $filename;
     }
 
     private function nextInvoiceNumber(Carbon $soldAt): string

@@ -1,0 +1,523 @@
+TOTAL PARAGRAPHS: 473
+TOTAL TABLES: 4
+
+[P0][Normal] TUGAS AKHIR II
+[P1][Normal] 
+[P2][Normal] RANCANG BANGUN KELOLA PERSEDIAAN BARANG GUDANG PADA TB. LOSARI JAYA 2 DENGAN METODE PROTOTYPING BERBASIS WEBSITE
+[P3][Normal] 
+[P4][Normal] Diajukan untuk memenuhi salah satu syarat
+[P5][Normal] Memperoleh gelar Sarjana Komputer
+[P6][Normal] 
+[P7][Normal] Disusun Oleh:
+[P8][Normal] 	Nama	: Muhammad Bagja Satrio
+[P9][Normal] 	NIM	: A11.2022.14694
+[P10][Normal] 	Program Studi	: Teknik Informatika
+[P11][Normal] 
+[P12][Normal] FAKULTAS ILMU KOMPUTER
+[P13][Normal] UNIVERSITAS DIAN NUSWANTORO
+[P14][Normal] SEMARANG
+[P15][Normal] Tahun 2025/2026
+[P16][Normal] 
+[P17][Normal] 
+[P18][Heading 1] PERSETUJUAN SKRIPSI
+[P19][Normal] 
+[P20][Normal] 
+[P21][Normal] Tugas Akhir ini telah diperiksa dan disetujui,
+[P22][Normal] Semarang, 09-06-2026
+[P23][Normal] 
+[P24][Normal] 
+[P25][Normal] 
+[P26][Normal] 
+[P27][Heading 1] PENGESAHAN DEWAN PENGUJI
+[P28][Normal] 
+[P29][Normal] 
+[P30][Normal] Tugas akhir ini telah diujikan dan dipertahankan dihadapan Dewan Penguji pada Sidang tugas akhir tanggal ………….. Menurut pandangan kami, tugas akhir ini memadai dari segi kualitas maupun kuantitas untuk tujuan penganugerahan
+[P31][Normal] gelar Sarjana Komputer (S.Kom)
+[P32][Normal] 
+[P33][Normal] Semarang, <tanggal format DD MM YYYY >
+[P34][Normal] Dewan Penguji:
+[P35][Normal] 
+[P36][Normal] 
+[P37][Heading 1] PERNYATAAN KEASLIAN SKRIPSI
+[P38][Normal] 
+[P39][Normal] Sebagai mahasiswa Universitas Dian Nuswantoro, yang bertanda tangan dibawah ini, saya:
+[P40][Normal] Nama	: 
+[P41][Normal] NIM	:
+[P42][Normal] Menyatakan bahwa karya ilmiah saya yang berjudul:
+[P43][Normal] 	
+[P44][Normal] 	
+[P45][Normal] 	
+[P46][Normal] 	
+[P47][Normal] 
+[P48][Normal] Merupakan karya asli saya (kecuali cuplikan dan ringkasan yang masing – masing telah saya jelaskan sumbernya). Apabila di kemudian hari, karya saya disinyalir bukan merupakan karya asli saya, yang disertai dengan bukti – bukti yang cukup, maka saya bersedia untuk dibatalkan gelar saya beserta hak dan kewajiban yang melekat pada gelar tersebut. Demikan pernyataan ini saya buat dengan sebenarnya.
+[P49][Normal] 
+[P50][Normal] 	Dibuat di	: Semarang
+[P51][Normal] 	Pada tanggal	: <format DD MM YYYY>
+[P52][Normal] 		Yang menyatakan
+[P53][Normal] 
+[P54][Normal] 	
+[P55][Normal] 
+[P56][Normal] 	(	)
+[P57][Normal] 
+[P58][Normal] 
+[P59][Heading 1] PERNYATAAN PERSETUJUAN PUBLIKASI KARYA ILMIAH UNTUK KEPENTINGAN AKADEMIS
+[P60][Normal] 
+[P61][Normal] Sebagai mahasiswa Universitas Dian Nuswantoro, yang bertanda tangan dibawah ini, saya:
+[P62][Normal] Nama	: 
+[P63][Normal] NIM	:
+[P64][Normal] Demi mengembangkan Ilmu Pengetahuan, menyetujui untuk memberikan kepada Universitas Dian Nuswantoro Hak Bebas Royalti Non-Eksklusif (Non-exclusive Royalty-Free Right) atas karya ilmiah saya yang berjudul:
+[P65][Normal] 	
+[P66][Normal] 	
+[P67][Normal] 	
+[P68][Normal] Beserta perangkat yang diperlukan (bila ada). Dengan Hak Bebas Royalti Non-Eksklusif ini Universitas Dian Nuswantoro berhak untuk menyimpan, mengcopy ulang (memperbanyak), menggunakan, mengelolanya dalam bentuk pangkalan data (database), mendistribusikannya dan menampilkan atau mempublikasikannya di internet atau media lain untuk kepentingan akademis tanpa perlu meminta ijin dari saya selama tetap mencantumkan nama saya sebagai penulis/pencipta.
+[P69][Normal] 
+[P70][Normal] Saya bersedia menanggung secara pribadi, tanpa melibatkan pihak Universitas Dian Nuswantoro, segala bentuk tuntutan hukum yang timbul atas pelanggaran Hak Cipta dalam karya ilmiah ini.
+[P71][Normal] Demikian surat pernyataan ini saya buat dengan sebenarnya.
+[P72][Normal] 
+[P73][Normal] 	Dibuat di	: Semarang
+[P74][Normal] 	Pada tanggal	: <format DD MM YYYY>
+[P75][Normal] 		Yang Menyatakan
+[P76][Normal] 	
+[P77][Normal] 
+[P78][Normal] 	(	)
+[P79][Heading 1] DAFTAR ISI
+[P80][Normal] 
+[P81][Heading 1] DAFTAR TABEL
+[P82][table of figures] Tabel 2.1 State-of-the-art	6
+[P83][table of figures] Tabel 2.2 Simbol Use Case Diagram	12
+[P84][table of figures] Tabel 2.3 Simbol Activity Diagram	14
+[P85][table of figures] Tabel 2.4 Simbol Class Diagram	16
+[P86][table of figures] Tabel 2.5 Kerangka Pemikiran	21
+[P87][table of figures] Tabel 3.1 Rencana Pengujian Blackbox	27
+[P88][table of figures] Tabel 3.2 Rencana Pengujian UAT	27
+[P89][table of figures] Tabel 4.1 Implementasi Database MySQL	49
+[P90][table of figures] Tabel 4.2 Pengujian Blackbox	51
+[P91][table of figures] Tabel 4.3 Pengujian UAT	52
+[P92][Normal] 
+[P93][table of figures] 
+[P94][Heading 1] DAFTAR GAMBAR
+[P95][table of figures] Gambar 2.1 Metode Prototyping	9
+[P96][table of figures] Gambar 2.2 Contoh Use Case Diagram	13
+[P97][table of figures] Gambar 2.3 Contoh Activity Diagram	15
+[P98][table of figures] Gambar 2.4 Contoh Class Diagram	17
+[P99][table of figures] Gambar 4.1 Use Case Diagram Sistem POS TB. Losari Jaya 2	29
+[P100][table of figures] Gambar 4.2 Activity Diagram Admin	30
+[P101][table of figures] Gambar 4.3 Activity Diagram Kasir	31
+[P102][table of figures] Gambar 4.4 Halaman Login	32
+[P103][table of figures] Gambar 4.5 Halaman Dashboard	33
+[P104][table of figures] Gambar 4.6 Halaman Daftar Barang	34
+[P105][table of figures] Gambar 4.7 Halaman Kelola Barang Masuk	35
+[P106][table of figures] Gambar 4.8 Halaman Data Supplier	36
+[P107][table of figures] Gambar 4.9 Halaman Kasir	37
+[P108][table of figures] Gambar 4.10 Halaman Keuangan	38
+[P109][table of figures] Gambar 4.11 Halaman Laporan Penjualan	39
+[P110][table of figures] Gambar 4.12 Halaman Laporan Stok Barang	40
+[P111][table of figures] Gambar 4.13 Halaman Data Pengguna	41
+[P112][table of figures] Gambar 4.14 Halaman Master Data Kategori dan Satuan Barang	42
+[P113][table of figures] Gambar 4.15 Halaman Detail Transaksi	43
+[P114][table of figures] Gambar 4.16 Halaman Cetak Ulang Struk	44
+[P115][table of figures] Gambar 4.17 Halaman PDF Laporan	45
+[P116][table of figures] Gambar 4.18 Sequence Diagram Transaksi Penjualan	46
+[P117][table of figures] Gambar 4.19 Class Diagram Sistem	47
+[P118][table of figures] Gambar 4.20 ERD Database Sistem	48
+[P119][table of figures] 
+[P120][Heading 1] RINGKASAN
+[P121][Normal] 
+[P122][Normal] TB. Losari Jaya 2 merupakan toko bangunan dengan tingkat perputaran persediaan yang tinggi sehingga membutuhkan pengelolaan stok yang akurat dan terstruktur. Dalam praktiknya, proses pencatatan barang masuk dan keluar masih dilakukan secara manual menggunakan buku tulis, yang berpotensi menimbulkan selisih data stok, keterlambatan informasi, serta risiko kehilangan atau kerusakan data. Permasalahan tersebut berdampak pada kesulitan pemantauan persediaan dan penyusunan laporan penjualan secara tepat. Penelitian ini bertujuan untuk merancang dan membangun sistem informasi penataan persediaan barang penjualan berbasis website yang mampu membantu proses pengelolaan stok dan transaksi secara lebih efektif dan real time. Metode pengembangan yang digunakan adalah metode Prototyping, yang meliputi tahap pengumpulan kebutuhan melalui komunikasi dengan pengguna, perancangan mock up sistem, pengujian Prototyping, serta evaluasi dan penyempurnaan berdasarkan umpan balik pengguna. Sistem informasi dikembangkan berbasis web dengan menggunakan framework Laravel dan basis data MySQL. Hasil penelitian menunjukkan bahwa sistem informasi berhasil diimplementasikan sesuai kebutuhan pengguna. Berdasarkan pengujian Black Box, seluruh fungsi sistem berjalan dengan valid dan aplikasi mampu mempermudah admin dalam pemantauan stok, pencatatan transaksi, serta rekapitulasi laporan persediaan barang. 
+[P123][Normal] 
+[P124][Heading 1] 
+[P125][Heading 1] 
+PENDAHULUAN
+[P126][Normal] 
+[P127][Heading 2] Latar Belakang
+[P128][Normal (Web)] Kemajuan teknologi informasi telah membawa dampak besar terhadap cara pelaku usaha mengelola data operasionalnya, khususnya pada bidang perdagangan yang memiliki intensitas transaksi dan perputaran barang tinggi. Dalam konteks tersebut, persediaan barang memiliki peran krusial karena secara langsung memengaruhi ketersediaan produk, kelancaran proses penjualan, serta mutu pelayanan kepada pelanggan. Namun, praktik pengelolaan stok yang masih dilakukan secara manual sering kali menimbulkan kendala serius, seperti ketidaksesuaian antara data dan kondisi riil, keterlambatan informasi, hingga kesulitan dalam penyusunan laporan (Gultom, 2022) Oleh karena itu, penerapan sistem informasi yang terintegrasi menjadi kebutuhan mendesak untuk menjamin ketepatan dan efisiensi dalam pengendalian persediaan.
+[P129][Normal (Web)] Studi lapangan yang dilakukan di TB. Losari Jaya 2—sebuah toko bangunan dengan jumlah item dan frekuensi transaksi yang tinggi—menunjukkan bahwa pencatatan stok dan transaksi masih dilakukan menggunakan buku tulis. Cara tradisional ini mengakibatkan ketidaksesuaian antara catatan dan stok fisik, menyulitkan proses pelacakan data, serta meningkatkan risiko kehilangan informasi. Situasi serupa juga umum terjadi pada berbagai usaha dagang lain yang belum beralih ke sistem digital, sehingga akurasi data rendah dan proses kerja menjadi tidak efisien (Widiatma & Abdillah, 2025).
+[P130][Normal (Web)] Penelitian terdahulu telah membuktikan bahwa penerapan sistem informasi persediaan berbasis web dapat memperbaiki tata kelola data barang secara signifikan. Sistem semacam ini memberikan manfaat berupa pengelolaan data secara real time, penurunan tingkat kesalahan input, percepatan pencarian informasi, serta peningkatan keakuratan laporan (Effendi & Noviansyah, 2018). Selain itu, pendekatan prototyping dinilai efektif karena memungkinkan keterlibatan pengguna selama proses pengembangan sistem. Dengan demikian, kebutuhan pengguna dapat diidentifikasi dan disesuaikan sejak tahap perancangan awal (Ahmad et al., 2024).
+[P131][Normal (Web)] Hasil penelitian terdahulu menegaskan bahwa penggabungan antara sistem penjualan dan sistem pengelolaan persediaan dapat meningkatkan ketepatan data serta mempercepat proses pembuatan laporan. Studi yang dilakukan oleh (Adikusuma et al., 2025) menunjukkan bahwa penerapan sistem informasi penjualan berbasis web menggunakan metode prototyping efektif dalam menekan tingkat kesalahan pencatatan transaksi dan secara otomatis memperbarui data stok barang. 
+[P132][Normal (Web)] Oleh karena itu, pada penelitian implementasi sistem saya ini diharapkan dapat memberikan kemudahan bagi pelaku usaha dalam mengelola aktivitas penjualan maupun persediaan dengan lebih sistematis, sekaligus mendukung tersusunnya laporan yang akurat dan dapat diakses dengan cepat. Hasil temuan tersebut memperkuat relevansi penerapan metode prototyping sebagai pendekatan yang tepat untuk dikembangkan pada sektor perdagangan dengan intensitas transaksi yang tinggi.
+[P133][Normal (Web)] 
+[P134][Heading 2] Rumusan Masalah
+[P135][Normal (Web)] Rumusan masalah berikut disusun secara ringkas dan fokus, dengan mengacu langsung pada konteks latar belakang penelitian yang telah diuraikan sebelumnya, sebagaimana dijelaskan berikut ini: 
+[P136][Normal (Web)] Bagaimana sistem pengelolaan persediaan barang yang masih dilakukan secara manual menggunakan buku tulis di TB. Losari Jaya 2?
+[P137][Normal (Web)] Bagaimana proses perancangan dan pengembangan sistem informasi penataan persediaan barang berbasis website dengan menerapkan metode?
+[P138][Normal (Web)] 
+[P139][Heading 2] Batasan Masalah
+[P140][Normal] Batasan masalah berikut disusun agar ruang lingkup penelitian tetap terarah dan konsisten dengan tujuan yang telah ditetapkan, sebagaimana dijelaskan berikut ini: 
+[P141][Normal] Penelitian ini berfokus pada proses perancangan serta pengembangan aplikasi berbasis web untuk pengelolaan persediaan barang penjualan dengan TB. Losari Jaya.
+[P142][Normal] Aplikasi dirancang menggunakan bahasa pemrograman PHP dengan basis data MySQL, sedangkan proses pengujian sistem dibatasi pada penerapan metode Black Box Testing.
+[P143][Normal] 
+[P144][Heading 2] Tujuan Penelitian
+[P145][Normal] Tujuan penelitian berikut disusun secara terarah dan konsisten dengan rumusan masalah yang telah ditetapkan sebelumnya, sebagaimana dijelaskan berikut ini:
+[P146][Normal] Mengembangkan dan merancang sistem informasi berbasis website yang berfungsi untuk menata serta mengelola data persediaan pada TB. Losari Jaya 2.
+[P147][Normal] Menerapkan metode prototyping dalam proses pengembangan sistem informasi persediaan guna memastikan bahwa sistem yang dibangun mampu menyesuaikan dengan kebutuhan pengguna serta mengurangi potensi kesalahan dalam pencatatan data stok barang.
+[P148][Normal] 
+[P149][Heading 2] Manfaat Penelitian
+[P150][Normal] Hasil penelitian ini diharapkan memberikan manfaat dalam dua aspek utama, yaitu manfaat teoritis dan manfaat praktis, sebagaimana dijelaskan berikut ini:
+[P151][Heading 3] Manfaat Bagi Penulis
+[P152][Normal (Web)] Menambah pengetahuan dan pengalaman bagi penulis dalam mengembangkan website persediaan barang penjualan menggunakan metode prototyping.
+[P153][Normal (Web)] Dapat menerapkan dan mengimplementasikan ilmu yang telah diberikan pada masa perkuliahan.
+[P154][Normal (Web)] 
+[P155][Heading 3] Manfaat Bagi Akademik
+[P156][Normal (Web)] Sebagai referensi bagi mahasiswa Universitas Dian Nuswantoro yang akan menyusun skripsi pada tahun berikutnya.
+[P157][Normal (Web)] Sebagai rujukan penelitian selanjutnya yang terkait dengan sistem persediaan barang penjualan berbasis website menggunakan metode prototyping.
+[P158][Normal (Web)] 
+[P159][Heading 3] Manfaat Bagi Masyarakat
+[P160][List Paragraph] Sebagai pengetahuan bagi masyarakat khususnya pelaku usaha kecil dan menengah di bidang perdagangan.
+[P161][List Paragraph] Sebagai pengetahuan bagi pengembang website yang ingin menerapkan sistem persediaan barang penjualan menggunakan metode prototyping.
+[P162][Normal] 
+[P163][Normal] 
+[P164][Heading 1] 
+[P165][Heading 1] 
+LANDASAN TEORI
+[P166][Normal] 
+[P167][Heading 2] Tinjauan Studi
+[P168][Normal (Web)] Pengelolaan persediaan memegang peranan krusial dalam menjaga kelancaran aktivitas usaha dagang karena berkaitan langsung dengan ketersediaan produk, proses transaksi, dan mutu pelayanan terhadap konsumen. Ketika pencatatan stok masih dilakukan secara manual, sering muncul berbagai kendala seperti perbedaan antara jumlah stok fisik dan data catatan, keterlambatan dalam memperoleh informasi, serta hambatan dalam penyusunan laporan persediaan. Hasil penelitian yang dilakukan oleh (Gultom, 2022) menunjukkan bahwa penggunaan sistem informasi berbasis web dalam pengelolaan stok barang mampu meningkatkan keteraturan dan ketepatan data dibandingkan metode manual.
+[P169][Normal (Web)] Selain meningkatkan akurasi, penerapan sistem informasi persediaan juga berkontribusi terhadap efisiensi pengelolaan data dan optimalisasi proses bisnis. (Effendi & Noviansyah, 2018) menegaskan bahwa sistem informasi manajemen persediaan dapat mempercepat proses pencarian data, memperlancar pengolahan informasi, dan mendukung pembuatan laporan persediaan secara berkala. Penelitian lain oleh (Widiatma & Abdillah, 2025) turut memperkuat temuan tersebut dengan menyatakan bahwa sistem inventori berbasis web dapat meminimalkan risiko kehilangan data serta meningkatkan ketepatan dalam pencatatan arus barang masuk dan keluar, terutama pada usaha dengan intensitas transaksi yang tinggi.
+[P170][Normal (Web)] Dalam konteks pengembangan sistem informasi, pemilihan metode rekayasa perangkat lunak menjadi aspek yang menentukan keberhasilan sistem agar sesuai dengan kebutuhan pengguna. Metode prototyping dinilai efektif karena memungkinkan pengguna terlibat aktif dalam tahapan perancangan hingga evaluasi sistem. Menurut (Ahmad et al., 2024), penerapan metode ini mampu menghasilkan aplikasi stok opname yang lebih responsif dan mudah digunakan sesuai dengan kebutuhan operasional. Temuan yang sejalan disampaikan oleh (Adikusuma et al., 2025) yang menyimpulkan bahwa sistem penjualan berbasis web dengan pendekatan prototyping dapat menekan tingkat kesalahan pencatatan serta memperbarui data stok secara otomatis. Berdasarkan hasil hasil penelitian tersebut, penerapan sistem informasi penataan persediaan barang berbasis web dengan metode prototyping dipandang tepat untuk diimplementasikan pada TB. Losari Jaya 2, guna meningkatkan efektivitas dan akurasi pengelolaan persediaan. 	
+[P171][Caption] Tabel 2.1 State-of-the-art
+[P172][Normal] 
+[P173][Normal]    
+[P174][Heading 2] Tinjauan Pustaka
+[P175][Heading 3] Sistem Informasi
+[P176][Normal] Sistem informasi dapat dipahami sebagai suatu kesatuan yang terdiri atas berbagai komponen yang saling berhubungan dan bekerja sama untuk mengumpulkan, mengelola, menyimpan, serta menyalurkan informasi yang dibutuhkan dalam menunjang aktivitas operasional maupun proses pengambilan keputusan organisasi. Keberadaan sistem ini berperan signifikan dalam menciptakan tata kelola bisnis yang lebih efisien, teratur, dan mudah diawasi. Dalam lingkup usaha dagang, sistem informasi dimanfaatkan untuk menangani data transaksi serta persediaan barang sehingga informasi yang dihasilkan menjadi lebih akurat dan mudah diakses. Implementasi sistem informasi yang dirancang dengan tepat terbukti mampu menekan tingkat kesalahan pencatatan, mempercepat proses pengolahan data, serta meningkatkan efektivitas kinerja pengguna (Gultom, 2022).
+[P177][Normal] 
+[P178][Heading 3] Penataan Persediaan Barang
+[P179][Normal (Web)] Penataan persediaan barang merupakan salah satu bentuk penyimpanan aset yang dimiliki perusahaan untuk dijual kembali maupun digunakan dalam mendukung aktivitas operasionalnya. Keberadaan penataan persediaan barang berperan penting dalam menjaga kelancaran proses penjualan serta memastikan kebutuhan pelanggan terpenuhi tepat waktu. Apabila pengelolaan persediaan dilakukan tanpa sistem yang terorganisir, maka dapat muncul berbagai permasalahan seperti kelebihan stok, kekurangan stok, hingga ketidaksesuaian antara data pencatatan dan kondisi fisik barang di lapangan. Oleh sebab itu, dibutuhkan suatu sistem pengelolaan persediaan yang mampu memantau dan mencatat setiap arus barang masuk maupun keluar dengan tingkat akurasi dan konsistensi yang tinggi (Effendi & Noviansyah, 2018).
+[P180][Normal (Web)] 
+[P181][Heading 3] Sistem Informasi Persediaan Barang
+[P182][Normal] Sistem informasi persediaan barang merupakan suatu mekanisme berbasis komputer yang dirancang untuk mengelola seluruh data terkait stok barang, mulai dari proses pencatatan barang yang masuk, distribusi barang keluar, hingga pembuatan laporan persediaan secara terstruktur. Tujuan utama sistem ini adalah menyajikan informasi stok secara akurat dan terkini (real time), sehingga pengguna dapat memantau kondisi ketersediaan barang dengan lebih mudah dan efisien. Berdasarkan penelitian yang dilakukan oleh (Widiatma & Abdillah, 2025), penerapan sistem informasi persediaan berbasis web terbukti mampu meningkatkan akurasi data, mempercepat proses pencarian informasi, serta meminimalkan risiko kehilangan data yang sering terjadi pada metode pencatatan manual.
+[P183][Normal] 
+[P184][Heading 3] Website
+[P185][Normal] Website merupakan platform yang dibangun menggunakan teknologi internet untuk menyajikan serta mengelola informasi secara daring dan terintegrasi. Sistem informasi yang dikembangkan berbasis web memiliki keunggulan utama pada aspek kemudahan akses, karena dapat dijalankan melalui berbagai jenis perangkat tanpa perlu instalasi aplikasi tambahan. Selain itu, sistem berbasis web juga mempermudah proses pemeliharaan maupun pembaruan fungsi sistem agar tetap relevan dengan kebutuhan pengguna. Dalam konteks usaha dagang, pemanfaatan website sebagai media pengelolaan informasi dinilai efektif karena mampu menyediakan data persediaan secara cepat, akurat, dan fleksibel sesuai kebutuhan operasional.
+[P186][Normal] 
+[P187][Heading 3] Basis Data
+[P188][Normal (Web)] Basis data merupakan kumpulan data yang disimpan secara terstruktur dan dikelola menggunakan sistem manajemen basis data (DBMS). Basis data berfungsi sebagai tempat penyimpanan utama data dalam sistem informasi, termasuk data barang, transaksi, dan laporan. Penggunaan basis data seperti MySQL memungkinkan penyimpanan data secara terorganisir, meminimalkan duplikasi data, serta mempermudah proses pengolahan dan pencarian informasi.
+[P189][Normal (Web)] MySQL merupakan sistem manajemen basis data relasional yang berfungsi sebagai komponen utama dalam penyimpanan dan pengelolaan data pada sistem informasi berbasis web. Melalui MySQL, berbagai data seperti daftar barang, transaksi masuk dan keluar, serta laporan stok dapat dikelola secara terstruktur dan terintegrasi.
+[P190][Normal (Web)] Hasil penelitian (Effendi & Noviansyah, 2018) menunjukkan bahwa pemanfaatan basis data relasional dalam sistem informasi persediaan dapat meningkatkan ketepatan data serta mempercepat proses pengolahan informasi. Temuan serupa dikemukakan oleh (Widiatma & Abdillah, 2025), yang menjelaskan bahwa sistem inventori berbasis web dengan dukungan basis data seperti MySQL mampu menekan kesalahan pencatatan dan mengurangi risiko kehilangan data. Dengan kemampuannya dalam menjaga konsistensi serta integritas data, MySQL dianggap sangat relevan digunakan sebagai basis data pendukung dalam pengembangan sistem informasi penataan persediaan barang penjualan berbasis website pada TB. Losari Jaya 2.
+[P191][Normal (Web)] 
+[P192][Heading 3] Metode Prototyping
+[P193][Normal] Metode prototyping merupakan pendekatan dalam pengembangan perangkat lunak yang berfokus pada pembuatan model awal sistem sebagai representasi dari fungsi dan tampilan yang akan dikembangkan secara menyeluruh. Melalui metode ini, pengguna dilibatkan secara aktif dalam proses evaluasi maupun penyempurnaan model sistem, sehingga hasil akhir dapat disesuaikan dengan kebutuhan aktual pengguna. Berdasarkan penelitian yang dilakukan oleh (Ahmad et al., 2024), penggunaan metode prototyping terbukti efektif dalam pengembangan sistem persediaan karena memungkinkan proses perbaikan dilakukan secara bertahap dan berulang melalui umpan balik langsung dari pengguna. Pendekatan ini dianggap paling tepat diterapkan pada sistem informasi persediaan yang memiliki karakteristik kebutuhan yang dinamis dan memerlukan penyesuaian berkelanjutan.
+[P194][Normal] 
+[P195][Heading 3] PHP
+[P196][Normal (Web)] PHP (Hypertext Preprocessor) adalah bahasa pemrograman sisi server yang umum digunakan dalam pengembangan sistem informasi berbasis web. Bahasa ini mampu menghasilkan halaman web yang dinamis serta memfasilitasi interaksi langsung antara aplikasi dan basis data relasional. Dalam konteks sistem informasi persediaan maupun penjualan, PHP sering dimanfaatkan karena kemampuannya dalam mengelola data transaksi secara sistematis dan berkelanjutan.
+[P197][Normal (Web)] Penelitian yang dilakukan oleh (Adikusuma et al., 2025) menunjukkan bahwa penggunaan PHP dalam pengembangan sistem informasi penjualan berbasis web memungkinkan pencatatan transaksi dilakukan secara otomatis sekaligus memperbarui data stok secara real time. Hasil serupa juga ditemukan pada penelitian (Ahmad et al., 2024) yang menerapkan PHP dalam pembangunan aplikasi stok opname berbasis metode prototyping. Dalam penelitian tersebut, PHP berperan penting dalam pengelolaan proses input data, pengolahan informasi, hingga penyajian laporan stok kepada pengguna. Selain itu, PHP dikenal fleksibel karena dapat dijalankan di berbagai sistem operasi dan didukung oleh web server populer, sehingga implementasinya sesuai untuk usaha berskala kecil hingga menengah. Berdasarkan karakteristik tersebut, PHP dinilai tepat digunakan sebagai dasar pengembangan sistem informasi penataan persediaan barang berbasis web pada TB. Losari Jaya 2. Adapun framework dari PHP yang dapat memudahkan pengembang dalam mengembangkan websitenya. Framework yang sering digunakan merupakan framework Laravel.
+[P198][Normal (Web)] Laravel merupakan framework PHP yang dirancang untuk membantu pengembang membangun sistem informasi berbasis web dengan struktur yang lebih terorganisasi dan efisien. Framework ini mengadopsi arsitektur Model View Controller (MVC), yang memisahkan antara logika aplikasi, pengelolaan data, dan tampilan antarmuka pengguna. Pemisahan ini tidak hanya mempercepat proses pengembangan, tetapi juga memudahkan proses pemeliharaan dan pembaruan sistem.
+[P199][Normal (Web)] Menurut (Adikusuma et al., 2025), penggunaan framework PHP dalam pengembangan sistem informasi berbasis web mampu mempercepat proses pembuatan aplikasi serta menyesuaikannya dengan kebutuhan pengguna. Sementara itu, (Ahmad et al., 2024) menegaskan bahwa framework seperti Laravel sangat mendukung penerapan metode prototyping, karena memungkinkan evaluasi dan penyempurnaan sistem dilakukan secara bertahap berdasarkan umpan balik pengguna. Dengan keunggulan dalam hal fleksibilitas, keteraturan struktur, dan kemudahan pengembangan, Laravel dinilai sesuai untuk digunakan dalam pembangunan sistem informasi penataan persediaan barang penjualan berbasis web.
+[P200][Normal (Web)] 
+[P201][Heading 3] UML
+[P202][Normal (Web)] Unified Modeling Language (UML) merupakan bahasa pemodelan standar yang digunakan untuk memvisualisasikan, merancang, dan mendokumentasikan sistem perangkat lunak secara terstruktur. UML berfungsi sebagai alat bantu komunikasi antara pengembang dan pengguna dalam memahami kebutuhan sistem sebelum tahap implementasi dilakukan. Penggunaan UML memungkinkan pengembang menggambarkan fungsi sistem, alur proses, serta hubungan antar komponen secara jelas sehingga dapat mengurangi kesalahan dalam pengembangan sistem. Penelitian (Adikusuma et al., 2025) menyatakan bahwa penerapan UML dalam perancangan sistem informasi berbasis web membantu meningkatkan pemahaman kebutuhan sistem dan mempercepat proses pengembangan aplikasi.
+[P203][Normal (Web)] Dalam pengembangan sistem informasi penataan persediaan barang penjualan pada TB. Losari Jaya 2, UML digunakan sebagai alat bantu perancangan untuk menggambarkan kebutuhan fungsional sistem dan struktur data yang akan diimplementasikan. Penggunaan UML juga sejalan dengan metode prototyping yang menekankan komunikasi intensif dengan pengguna, karena model visual yang dihasilkan lebih mudah dipahami dibandingkan deskripsi teknis semata (Ahmad et al., 2024). Adapun jenis jenis diagram UML, sebagaimana berikut :
+[P204][Normal (Web)] Use Case Diagram
+[P205][Caption] Tabel 2.2 Simbol Use Case Diagram
+[P206][Normal] 
+[P207][Normal (Web)] 
+[P208][Normal (Web)] Use Case Diagram memvisualisasikan interaksi antara pengguna dan sistem melalui sejumlah simbol utama. Aktor digambarkan dengan ikon manusia stick untuk merepresentasikan pihak eksternal, seperti pengguna atau administrator, yang berinteraksi langsung dengan sistem. Use case ditampilkan dalam bentuk ellips yang menggambarkan fungsi atau layanan sistem, sedangkan Association relationship menghubungkan aktor dengan fungsi tersebut. Hubungan antar use case dijelaskan melalui simbol include dan extend, di mana include menunjukkan fungsi yang selalu dijalankan bersamaan, sedangkan extend merepresentasikan fitur tambahan yang aktif pada kondisi tertentu. Seluruh elemen sistem dibatasi oleh persegi panjang yang menandakan ruang lingkup sistem. Melalui representasi ini, Use Case Diagram memberikan pemahaman fungsional sistem secara terstruktur dan mudah dipahami.
+[P209][Normal (Web)] 
+[P210][Caption] Gambar 2.2 Contoh Use Case Diagram
+[P211][Normal] Diagram Use Case pada sistem Appointment System memperlihatkan hubungan interaktif antara berbagai pengguna dan sistem secara keseluruhan. Terdapat empat aktor utama, yaitu Patient, New Patient, Doctor, dan Management, yang masing masing menjalankan fungsi berbeda sesuai perannya. Kedua aktor pertama, Patient dan New Patient, berpartisipasi dalam use case Make Appointment, yang merepresentasikan proses pembuatan janji temu. Di sisi lain, Management berperan dalam use case Produce Schedule Information untuk menghasilkan data jadwal yang diperlukan, sedangkan Doctor berinteraksi melalui use case Record Availability guna mencatat ketersediaan waktu praktik. Seluruh aktivitas tersebut berada dalam batas sistem yang dilambangkan oleh area Appointment System, yang menegaskan ruang lingkup serta batas tanggung jawab sistem. Secara keseluruhan, diagram ini memperlihatkan perbedaan hak akses dan fungsi setiap aktor, sekaligus memberikan gambaran fungsional sistem secara ringkas, terstruktur, dan mudah dipahami.
+[P212][Normal] 
+[P213][Normal] 
+[P214][Normal] 
+[P215][Normal] 
+[P216][Normal] 
+[P217][Normal] 
+[P218][Normal] 
+[P219][Normal] 
+[P220][Normal] 
+[P221][Normal] 
+[P222][Normal (Web)] Activity Diagram
+[P223][Caption] Tabel 2.3 Simbol Activity Diagram
+[P224][Normal] 
+[P225][List Paragraph] Diagram aktivitas merupakan representasi visual dari berbagai aktivitas utama dan hubungan satu dengan lainnya. Diagram ini menggambarkan bagaimana berbagai Tindakan atau aktivitas saling berkaitan dalam suatu sistem atau prosedur. Tabel 2.3 menunjukan panduan tata letak dan elemen yang digunakan pada diagram aktivitas.
+[P226][Normal] 	
+[P227][Caption] Gambar 2.3 Contoh Activity Diagram
+[P228][Normal] Diagram alir yang ditampilkan menunjukkan tahapan pemenuhan pesanan secara menyeluruh, dimulai dari tahap penerimaan pesanan (Receive Order). Setelah pesanan dicatat, langkah selanjutnya adalah menyiapkan pesanan tersebut (Fill Order). Pada tahap berikutnya, sistem mengevaluasi prioritas pesanan: untuk pesanan cepat (rush order), pengiriman dilakukan secara overnight (Arrange Overnight Delivery), sedangkan untuk pesanan biasa, pengiriman dijadwalkan secara reguler (Arrange Regular Delivery). Setelah proses pengiriman ditetapkan, faktur dikirimkan kepada pelanggan (Send Invoice), dan alur ditutup dengan penerimaan pembayaran (Receive Payment). Secara keseluruhan, diagram ini menggambarkan alur kerja yang terstruktur dengan jelas, menekankan cabang keputusan berdasarkan jenis pesanan sehingga setiap pesanan diproses sesuai prioritas sebelum penagihan dilakukan.
+[P229][Normal] 
+[P230][Normal (Web)] Class Diagram
+[P231][Caption] Tabel 2.4 Simbol Class Diagram
+[P232][Normal] 
+[P233][Normal (Web)] Diagram kelas termasuk salah satu diagram statis dalam Unified Modeling Language (UML) yang berfungsi untuk menggambarkan struktur konseptual suatu sistem. Diagram ini menekankan pada hubungan antar kelas, atribut, dan metode yang dimiliki masing masing kelas, serta asosiasi yang terbentuk di dalam sistem. Setiap kelas merepresentasikan entitas atau konsep utama dalam domain masalah, sementara atribut mencerminkan properti yang dimiliki entitas tersebut dan metode menunjukkan perilaku atau fungsi yang dapat dijalankan oleh kelas. Selain itu, diagram kelas juga menampilkan jenis hubungan antar kelas, seperti inheritance, aggregation, dan composition, sehingga mempermudah pemahaman hierarki serta interaksi antar objek dalam sistem. Dengan demikian, penggunaan diagram kelas pada tahap perancangan memudahkan dokumentasi struktur sistem, mengurangi potensi kesalahan desain, dan mendukung pengembangan perangkat lunak yang lebih terstruktur serta terkontrol.
+[P234][Normal (Web)] Diagram kelas yang disajikan menggambarkan desain sistem informasi medis berbasis pendekatan berorientasi objek dengan delapan kelas utama yang saling terkait. Kelas Patient berfungsi sebagai entitas pusat, menyimpan data identitas dan informasi administratif pasien, termasuk atribut seperti Treatment, Insurance, Address, Phone, Birthdate, dan Age. Kelas ini dihubungkan dengan kelas Provider yang merepresentasikan penyedia layanan kesehatan. Untuk memodelkan aspek klinis pasien, digunakan dua kelas tambahan: Medical History, yang mencatat riwayat penyakit sistemik dan alergi, serta Symptoms, yang merekam gejala subjektif dan objektif. Proses diagnostik diwakili oleh kelas Diagnosis, yang memuat metode pemeriksaan mulai dari anamnesis hingga pencitraan, serta kelas Pathology, yang mendetailkan prosedur laboratorium yang terkait. Selain itu, kelas Appointments menangani administrasi janji temu, sedangkan kelas Laboratory Tests mencakup berbagai pemeriksaan penunjang, meskipun detail atributnya tidak sepenuhnya ditampilkan dalam diagram. Keseluruhan struktur ini menunjukkan integrasi menyeluruh antara aspek administratif, klinis, dan penunjang medis, yang dirancang untuk memfasilitasi pengelolaan data pasien secara lebih efektif dan efisien.
+[P235][Normal (Web)] 
+[P236][Heading 3]  Blackbox Testing
+[P237][Normal] Pengujian Black Box, atau Black Box Testing, merupakan metode evaluasi perangkat lunak yang menekankan pada pemeriksaan fungsionalitas sistem sesuai spesifikasi kebutuhan pengguna, tanpa memeriksa struktur internal, kode, atau logika implementasinya. Pengujian ini dilakukan dengan memasukkan input tertentu dan memeriksa output yang dihasilkan untuk memastikan perilaku sistem sesuai harapan. Metode ini sangat bermanfaat pada tahap akhir pengembangan karena memvalidasi bahwa seluruh fitur telah memenuhi kebutuhan fungsional dari sudut pandang pengguna akhir. Dalam konteks sistem informasi inventory dan penjualan berbasis website, penelitian oleh (Widiatma & Abdillah, 2025) pada Toko Yuda serta (Ahmad et al., 2024) pada sistem stok opname menunjukkan bahwa pendekatan ini efektif untuk memverifikasi fungsi login, pengelolaan data master, proses transaksi, dan ketahanan sistem terhadap input yang tidak valid. Adapun teknik Black Box Testing yang umum diterapkan meliputi:
+[P238][List Paragraph] Equivalence Partitioning (Pembagian Kelas Ekuivalen): Domain input dibagi ke dalam beberapa kelompok yang memiliki pola pemrosesan serupa. Dari setiap kelompok, diambil sampel representatif untuk diuji, sehingga jumlah kasus uji dapat dikurangi secara signifikan.
+[P239][List Paragraph] Boundary Value Analysis (Analisis Nilai Batas): Fokus pengujian berada pada nilai nilai batas dari setiap partisi input, seperti nilai minimum, maksimum, serta nilai tepat di bawah dan di atas batas. Kondisi batas sering menjadi sumber kesalahan logika.
+[P240][List Paragraph] Cause Effect Graphing (Grafik Sebab Akibat): Teknik ini memanfaatkan grafik untuk memetakan hubungan logis antara input (penyebab) dan output (akibat) yang diharapkan. Representasi grafis tersebut digunakan untuk merancang kasus uji secara komprehensif.
+[P241][Normal (Web)] Decision Table Testing (Pengujian Tabel Keputusan): Cocok untuk sistem dengan logika bisnis kompleks yang melibatkan banyak kondisi. Tabel keputusan menampilkan semua kombinasi kondisi dan tindakan terkait, memudahkan penyusunan kasus uji lengkap.
+[P242][Normal (Web)] State Transition Testing (Pengujian Transisi Status): Digunakan pada sistem yang perilakunya bergantung pada status sebelumnya, seperti proses login, mesin ATM, atau workflow persetujuan. Pengujian meliputi transisi valid maupun tidak valid antar status.
+[P243][Normal (Web)] Error Guessing (Penebakan Kesalahan): Mengandalkan pengalaman dan intuisi penguji untuk mengidentifikasi area rawan kesalahan, misalnya input kosong, format tidak sesuai, atau operasi tidak umum.
+[P244][Normal (Web)] All Pairs Testing (Pengujian Pasangan): Juga dikenal sebagai pairwise testing, teknik ini menguji seluruh kombinasi diskret dari setiap pasangan parameter input. Pendekatan ini efisien untuk mengurangi jumlah kasus uji sambil tetap menjaga cakupan kombinasi yang baik.
+[P245][Normal (Web)] 
+[P246][Normal (Web)] 
+[P247][Heading 3] User Acceptance Testing (UAT)
+[P248][Normal (Web)] User Acceptance Testing (UAT), atau Pengujian Penerimaan Pengguna, merupakan tahap penting dalam siklus pengembangan sistem yang difokuskan pada validasi kesesuaian sistem dengan kebutuhan bisnis serta spesifikasi fungsional dari perspektif pengguna akhir. Berbeda dengan pengujian teknis, seperti unit, integrasi, atau sistem, yang menitikberatkan pada keakuratan kode dan komponen, UAT menilai sejauh mana solusi yang diterapkan dapat mendukung proses bisnis secara efektif, efisien, dan mudah digunakan di lingkungan nyata. Tahap ini biasanya menjadi syarat utama sebelum sistem resmi diserahkan dan dijalankan secara operasional.
+[P249][Normal (Web)] UAT dijalankan oleh pengguna akhir atau perwakilan klien, bukan oleh pengembang atau tim QA internal. Tujuannya adalah memastikan sistem mampu menangani skenario bisnis nyata, bukan sekadar mendeteksi bug teknis minor seperti kesalahan tampilan atau glitch fungsional yang seharusnya sudah diatasi pada pengujian sebelumnya. Dengan demikian, UAT berfungsi sebagai verifikasi akhir bahwa perangkat lunak dapat diterima oleh pengguna sebagai solusi siap pakai. Dalam pengembangan sistem informasi untuk UMKM—misalnya sistem inventory Toko Yuda (Widiatma & Abdillah, 2025), aplikasi stok opname (Ahmad et al., 2024), atau sistem penjualan Toko SRC Bu Herlin (Adikusuma et al., 2025)—UAT menentukan apakah sistem benar benar menyederhanakan pencatatan manual, mempercepat alur kerja, dan meningkatkan akurasi pelaporan sesuai harapan pemilik usaha dan staf.
+[P250][Normal (Web)] 
+[P251][Normal (Web)] 
+[P252][Normal (Web)] 
+[P253][Normal (Web)] 
+[P254][Heading 2] Kerangka Pemikiran
+[P255][Caption] Tabel 2.5 Kerangka Pemikiran
+[P256][Normal] 
+[P257][Normal] 
+[P258][Heading 1] 
+METODE PENELITIAN
+[P259][Normal] 
+[P260][Heading 2] Sumber Data
+[P261][Normal] Pengumpulan data menjadi tahap awal yang krusial dalam pengembangan sistem, karena berfungsi untuk mengidentifikasi permasalahan, merumuskan kebutuhan, serta merancang solusi sistem informasi yang sesuai untuk TB. Losari Jaya 2. Dalam penelitian ini, pengembang dan user bertemu untuk membahas detail yang diinginkan.  Adapun pendekatan kombinasi antara data primer dan data sekunder untuk memastikan analisis yang komprehensif dan akurat sebagai berikut :
+[P262][Heading 3] Data Primer
+[P263][List Paragraph] Data primer didapat dengan memperoleh data langsung dengan mendatangi TB. Losari Jaya 2. Dalam tahapan ini, penulis menggunakan beberapa tahapan seperti :
+[P264][List Paragraph] Wawancara
+[P265][List Paragraph] Obervasi
+[P266][List Paragraph] Studi dokumen
+[P267][List Paragraph] 
+[P268][Heading 3] Data Sekunder
+[P269][Normal] Data sekunder diperoleh secara tidak langsung melalui kajian terhadap literatur dan penelitian terdahulu yang relevan. Data ini digunakan untuk membangun landasan teori, memahami metode pengembangan yang efektif, dan membandingkan solusi yang ada.
+[P270][Normal] 
+[P271][Heading 2] Metode Pengumpulan Data
+[P272][Normal] Pada tahap ini, data dan informasi dikumpulkan dari wawancara, observasi dan studi dokumen. Berikut tahapannya :
+[P273][Heading 3] Wawancara
+[P274][Normal] Beberapa pertanyaan diberikan kepada pemilik TB.Losari Jaya 2, yaitu :
+[P275][List Paragraph] Apakah sistem pencatatan manual dengan buku tulis bersifat efisien?
+[P276][List Paragraph] Apa saja kendala dari sistem pencatatan manual dengan buku tulis?
+[P277][List Paragraph] Apakah setuju jika sistem manual diganti dengan sistem modern dengan berbasis website?
+[P278][List Paragraph] Apa ekspetasi anda pada sistem modern berbasis website ini?
+[P279][List Paragraph] 
+[P280][Heading 3] Observasi
+[P281][Normal] Observasi partisipatif pasif dilakukan dengan mengamati secara langsung aktivitas operasional di TB. Losari Jaya 2 selama periode tertentu. Fokus utama observasi mencakup proses bisnis inti, yaitu:
+[P282][List Paragraph] Proses Pembelian/Barang Masuk: Aktivitas terkait penerimaan barang dari supplier.
+[P283][List Paragraph] Proses Penjualan: Transaksi penjualan kepada pelanggan.
+[P284][List Paragraph] Proses Pencatatan: Cara pemilik mencatat transaksi dalam buku stok, melakukan pengecekan fisik, dan menghitung ulang stok diamati secara seksama.
+[P285][List Paragraph] 
+[P286][Heading 3] Studi Dokumen
+[P287][Normal] Studi dokumen dilakukan dengan dokumen fisik yang saat ini digunakan dalam operasional toko, sebagai bukti objektif penerapan sistem manual. Dokumen yang dianalisis meliputi:
+[P288][List Paragraph] Buku catatan stock utama.
+[P289][List Paragraph] Nota penjualan manual.
+[P290][List Paragraph] Buku catatan hutang piutang.
+[P291][List Paragraph] 
+[P292][List Paragraph] 
+[P293][List Paragraph] 
+[P294][List Paragraph] 
+[P295][Heading 2] Metode Pengembangan Sistem
+[P296][Normal] Berikut Langkah langkah metode pengembangan sistem berbasis prototyping pada sistem penataan persediaan barang TB.Losari Jaya 2 :
+[P297][Heading 3] Communication
+[P298][Normal] Tahap awal difokuskan pada pemahaman mendalam mengenai permasalahan dan kebutuhan pengguna. Observasi dan wawancara mengidentifikasi bahwa TB. Losari Jaya 2 menggunakan sistem pencatatan stok manual yang menimbulkan ketidakakuratan data, lambatnya pencarian informasi, kesulitan pembuatan laporan, dan risiko kehilangan data. Melalui komunikasi intensif dengan pemilik, disepakati bahwa solusi yang dibutuhkan adalah sistem informasi berbasis website yang menampilkan laporan secara real time. Proses komunikasi ini juga menyelaraskan ekspektasi pengembang dan pengguna terkait ruang lingkup, fitur, dan tujuan sistem.
+[P299][Normal] 
+[P300][Heading 3] Quick Plan
+[P301][Normal] Hasil komunikasi digunakan untuk merumuskan rencana pengembangan prototyping yang menitikberatkan pada fitur fitur inti untuk mengatasi masalah utama. Fitur utama pada prototyping awal mencakup:
+[P302][List Paragraph] Manajemen Data Master: Modul untuk mengelola data barang, kategori, supplier, dan pengguna (admin, staf).
+[P303][List Paragraph] Transaksi Barang Masuk: Fitur untuk mencatat penerimaan barang dari supplier dan secara otomatis menambah stok.
+[P304][List Paragraph] Transaksi Penjualan: Fitur pencatatan penjualan yang otomatis mengurangi stok dan mencetak nota.
+[P305][List Paragraph] Laporan Stok dan Penjualan: Menyajikan laporan harian atau bulanan stok dan penjualan, termasuk kemampuan cetak.
+[P306][List Paragraph] Dashboard: Menampilkan ringkasan informasi penting seperti stok minimum dan penjualan hari ini.
+[P307][List Paragraph] 
+[P308][Heading 3] Modeling Quick Design
+[P309][Normal] Quick design dibuat berdasarkan rencana yang telah disepakati, dengan fokus pada alur kerja (workflow) dan antarmuka pengguna (user interface) untuk fitur utama:
+[P310][Normal] Manajemen Data Master: Halaman CRUD yang sederhana dan mudah dibaca.
+[P311][Normal] Transaksi Barang Masuk: Form input memungkinkan pemilihan barang, jumlah, harga dengan perhitungan total dan pembaruan stok otomatis.
+[P312][Normal] Transaksi Penjualan: Antarmuka kasir untuk pencarian barang cepat, penambahan ke keranjang, penghitungan total, diskon, dan pembayaran, dengan nota yang dapat dicetak langsung.
+[P313][Normal] Laporan: Halaman dengan filter periode dan tombol ekspor ke PDF/Excel.
+[P314][Normal] Dashboard: Tampilan visual berbentuk kartu dan grafik sederhana untuk menampilkan informasi inti.
+[P315][Normal] 
+[P316][Heading 3] Construction of Prototyping
+[P317][Normal] Tahap ini merealisasikan desain menjadi prototyping yang dapat diuji, dibagi menjadi dua iterasi:
+[P318][Normal] Prototyping 1 (Fungsionalitas Dasar): Fokus pada logika bisnis inti dan backend, mencakup manajemen data barang, transaksi barang masuk sederhana, dan daftar stok. Antarmuka masih low fidelity. Tujuan utamanya adalah memvalidasi proses bisnis seperti perhitungan stok otomatis dan struktur database.
+[P319][Normal] Prototyping 2 (Antarmuka dan Fitur Lengkap): Berdasarkan masukan dari Prototyping 1, fungsionalitas disempurnakan dan antarmuka dikembangkan menjadi high fidelity. Fitur transaksi penjualan, dashboard, dan laporan diimplementasikan sepenuhnya menggunakan framework CSS (Tailwind) agar responsif dan mudah digunakan. validasi input dan feedback pengguna juga ditingkatkan.
+[P320][Normal] Evaluasi internal dan bersama pengguna mengidentifikasi beberapa perbaikan, antara lain:
+[P321][Normal] Penyempurnaan form transaksi untuk diskon dan pajak.
+[P322][Normal] Perbaikan tata letak dashboard agar informasi lebih mudah dibaca.
+[P323][Normal] 
+[P324][Heading 3] Deployment Delivery & Feedback
+[P325][Normal] Tahap akhir mencakup penyerahan sistem untuk diuji dalam lingkungan nyata dan pengumpulan umpan balik:
+[P326][List Paragraph] Deployment: Sistem yang telah melewati pengujian fungsional diinstal pada server lokal atau hosting yang dapat diakses di TB. Losari Jaya 2.
+[P327][List Paragraph] Delivery: Sistem diserahkan kepada pemilik dan staf untuk digunakan secara paralel dengan sistem manual selama uji coba, lengkap dengan pelatihan singkat dan dokumentasi pengguna.
+[P328][List Paragraph] Feedback: Selama 1–2 minggu uji coba, pengguna memberikan umpan balik melalui wawancara. Masukan ini digunakan untuk mengidentifikasi bug, masalah usability, atau fitur tambahan, dan menjadi dasar pengembangan hingga sistem final siap produksi.
+[P329][List Paragraph] 
+[P330][Heading 2] Metode Pengujian
+[P331][Normal] Untuk memastikan sistem yang dikembangkan bekerja sesuai fungsi dan diterima pengguna, penelitian ini menerapkan dua jenis pengujian. Pertama, Black Box Testing digunakan untuk memeriksa fungsionalitas teknis sistem tanpa memperhatikan kode atau logika internal. Kedua, User Acceptance Testing (UAT) dilakukan untuk menilai sejauh mana sistem dapat diterima oleh pengguna akhir.
+[P332][Heading 3] Black Box Testing
+[P333][Normal] Pengujian Black Box berfokus pada kesesuaian output terhadap input yang diberikan, sesuai spesifikasi sistem, tanpa menelaah struktur internal. Setiap modul utama, termasuk login, manajemen data master (barang, supplier), transaksi, dan laporan, diuji untuk memastikan beroperasi sesuai harapan.
+[P334][Caption] Contoh rencana pengujian untuk beberapa fitur penting dapat dilihat pada Tabel 3.1. berikut :
+[P335][Caption] Tabel 3.1 Rencana Pengujian Blackbox
+[P336][Normal] 
+[P337][Heading 3] UAT
+[P338][Normal] Setelah Black Box Testing menunjukkan sistem stabil secara fungsional, UAT dilakukan untuk memverifikasi apakah sistem memenuhi kebutuhan bisnis dan mudah digunakan oleh pengguna akhir pemilik TB. Losari Jaya 2. UAT menjadi prasyarat sebelum implementasi penuh.
+[P339][Caption] Tabel 3.2 Rencana Pengujian UAT
+[P340][Normal] 
+[P341][Normal] 
+[P342][Normal] 
+[P343][Heading 1] 
+HASIL PENELITIAN DAN PEMBAHASAN
+[P344][Heading 2] Metode Pengembangan Sistem
+[P345][Normal] Pengembangan sistem informasi penataan persediaan barang penjualan pada TB. Losari Jaya 2 dilakukan menggunakan metode prototyping. Metode ini dipilih karena proses pengembangan membutuhkan keterlibatan pengguna secara langsung, sehingga kebutuhan toko dapat diketahui lebih cepat dan perbaikan dapat dilakukan berdasarkan umpan balik dari pemilik maupun kasir.
+[P346][Normal] Implementasi sistem dibuat dalam bentuk aplikasi Point of Sale berbasis web menggunakan framework Laravel, basis data MySQL, serta antarmuka web yang dapat digunakan untuk pengelolaan data barang, transaksi penjualan, barang masuk, laporan, dan informasi keuangan toko.
+[P347][Heading 3] Prototype 1
+[P348][Normal] Pada prototype pertama, fokus pengembangan diarahkan pada pemahaman kebutuhan utama dan rancangan dasar alur sistem. Berdasarkan observasi, proses stok barang dan transaksi penjualan di TB. Losari Jaya 2 masih dilakukan secara manual, sehingga sering menimbulkan keterlambatan pencarian data, potensi kesalahan pencatatan stok, dan kesulitan penyusunan laporan.
+[P349][List Paragraph] Communication
+[P350][Normal] Tahap communication dilakukan dengan mengidentifikasi kebutuhan admin dan kasir. Admin membutuhkan fitur pengelolaan data barang, kategori, satuan, supplier, barang masuk, laporan, dan keuangan toko. Kasir membutuhkan fitur transaksi penjualan yang cepat, perhitungan total otomatis, pencetakan struk, serta akses untuk melihat detail transaksi.
+[P351][List Paragraph] Quick plan
+[P352][Normal] Tahap quick plan menghasilkan rancangan awal fitur prioritas, yaitu login, dashboard, data barang, master kategori, master satuan, supplier, barang masuk, transaksi kasir, laporan, dan ringkasan stok. Rancangan ini menjadi dasar pembentukan model analisis pada sistem.
+[P353][List Paragraph] Model analisis
+[P354][Normal] 
+[P355][Caption] Gambar 4.1 Use Case Diagram Sistem TB. Losari Jaya 2
+[P356][Normal] Pada Gambar 4.1 terdapat dua aktor utama, yaitu admin dan kasir. Admin berperan mengelola data master, stok, supplier, barang masuk, laporan, keuangan toko, void transaksi, retur penjualan, stok opname, serta data pelanggan dan hutang piutang. Kasir berperan menjalankan transaksi penjualan, melihat detail transaksi, dan mencetak ulang struk ketika diperlukan. Admin juga dapat mengelola data pengguna serta melakukan reset data demo untuk keperluan pengujian.
+[P357][Normal] 
+[P358][Caption] Gambar 4.2 Activity Diagram Admin
+[P359][Normal] Pada Gambar 4.2 terlihat alur aktivitas admin setelah berhasil login. Admin dapat berpindah dari dashboard menuju menu data barang, master data, barang masuk, laporan, keuangan, detail transaksi, void transaksi, retur penjualan, stok opname, data pelanggan, hutang piutang, reset data demo, hingga logout. Alur void memungkinkan admin membatalkan transaksi yang salah dan mengembalikan stok secara otomatis. Alur retur menangani pengembalian barang dari pembeli dengan pencatatan refund. Alur stok opname digunakan untuk mencocokkan stok fisik dengan stok sistem dan melakukan penyesuaian. Alur pelanggan dan hutang piutang mencatat data pembeli serta transaksi kredit, DP, dan cicilan. Alur tersebut menggambarkan bahwa admin menjadi aktor utama dalam pengendalian persediaan dan informasi manajerial toko.
+[P360][Normal] 
+[P361][Caption] Gambar 4.3 Activity Diagram Kasir
+[P362][Normal] Pada Gambar 4.3 menggambarkan aktivitas kasir dalam memproses penjualan. Kasir memilih barang, memeriksa stok, memasukkan jumlah dan diskon, menerima pembayaran tunai maupun digital melalui QRIS, menyimpan transaksi, kemudian mencetak struk. Setelah transaksi tersimpan, stok barang otomatis berkurang sesuai jumlah penjualan. Kasir juga dapat melihat daftar transaksi yang telah dilakukan serta mencetak ulang struk jika diperlukan.
+[P363][List Paragraph] Model Design
+[P364][Normal] Pada tahap model design, rancangan antarmuka difokuskan pada penyusunan tampilan web yang mudah digunakan oleh admin dan kasir. Setiap halaman dibuat untuk mendukung proses operasional toko, mulai dari login, pemantauan dashboard, pengelolaan barang, transaksi kasir, laporan, keuangan, hingga manajemen pengguna.
+[P365][Normal] 
+[P366][Caption] Gambar 4.4 Halaman Login
+[P367][Normal] Pada Gambar 4.4 terlihat halaman login sistem TB. Losari Jaya 2. Halaman ini digunakan oleh admin dan kasir untuk masuk ke sistem menggunakan username dan password yang telah dibuat oleh admin. Tampilan login dibuat sederhana agar pengguna dapat langsung mengakses sistem tanpa informasi demo akun pada layar.
+[P368][Normal] 
+[P369][Caption] Gambar 4.5 Halaman Dashboard
+[P370][Normal] Pada Gambar 4.5 terlihat halaman dashboard yang menampilkan ringkasan operasional toko dalam satu layar. Informasi yang ditampilkan meliputi total transaksi hari ini, pendapatan hari ini, jumlah stok aktif, stok menipis, grafik tren penjualan, aktivitas kasir, dan riwayat barang masuk terbaru. Halaman ini membantu admin memantau kondisi penjualan dan persediaan secara cepat.
+[P371][Normal] 
+[P372][Caption] Gambar 4.6 Halaman Daftar Barang
+[P373][Normal] Pada Gambar 4.6 terlihat halaman daftar barang yang digunakan untuk mengelola data persediaan. Admin dapat melihat nama barang, kategori, supplier, jumlah stok, harga jual, serta tombol aksi untuk mengedit, melakukan restock, atau menghapus data barang. Fitur pencarian dan filter kategori juga membantu mempercepat proses pencarian barang.
+[P374][Normal] 
+[P375][Caption] Gambar 4.7 Halaman Kelola Barang Masuk
+[P376][Normal] Pada Gambar 4.7 terlihat halaman kelola barang masuk yang digunakan untuk mencatat penerimaan stok dari supplier. Admin mengisi tanggal, supplier, barang, jumlah masuk, harga beli per unit, dan catatan penerimaan. Setelah data disimpan, stok barang otomatis bertambah dan riwayat restock ditampilkan pada bagian penerimaan barang terbaru.
+[P377][Normal] 
+[P378][Caption] Gambar 4.8 Halaman Data Supplier
+[P379][Normal] Pada Gambar 4.8 terlihat halaman data supplier yang berfungsi menyimpan informasi pemasok barang. Sistem menampilkan nama supplier, jumlah barang yang terkait, total restock, dan tombol aksi untuk mengubah atau menghapus data. Data supplier digunakan sebagai acuan pada pencatatan barang dan penerimaan stok.
+[P380][Normal] 
+[P381][Caption] Gambar 4.9 Halaman Kasir
+[P382][Normal] Pada Gambar 4.9 terlihat halaman kasir yang digunakan untuk memproses transaksi penjualan. Kasir dapat mencari barang, memfilter kategori, memilih barang ke keranjang, mengatur diskon, memasukkan uang bayar, menghitung kembalian, dan mencetak nota. Setiap transaksi yang berhasil disimpan akan mengurangi stok barang secara otomatis.
+[P383][Normal] 
+[P384][Caption] Gambar 4.10 Halaman Keuangan
+[P385][Normal] Pada Gambar 4.10 terlihat halaman keuangan toko yang menampilkan data pendapatan, pengeluaran, keuntungan, margin, dan arus keuangan. Informasi ini membantu admin melihat kondisi keuangan toko berdasarkan transaksi penjualan dan barang masuk sehingga perhitungan laba rugi dapat dipantau dengan lebih jelas.
+[P386][Normal] 
+[P387][Caption] Gambar 4.11 Halaman Laporan Penjualan
+[P388][Normal] Pada Gambar 4.11 terlihat halaman laporan penjualan yang menyediakan ringkasan transaksi berdasarkan periode tertentu. Admin dapat memilih periode laporan, melihat total pendapatan, total transaksi, rata-rata transaksi, serta rincian penjualan harian. Halaman ini juga menyediakan tombol ekspor CSV dan cetak PDF untuk kebutuhan dokumentasi laporan.
+[P389][Normal] 
+[P390][Caption] Gambar 4.12 Halaman Laporan Stok Barang
+[P391][Normal] Pada Gambar 4.12 terlihat halaman laporan stok barang yang menampilkan snapshot persediaan toko. Informasi yang tersedia meliputi nilai persediaan, jumlah stok aktif, stok minimum, daftar barang, kategori, supplier, stok, harga, dan status persediaan. Status seperti aman atau perlu restock membantu admin menentukan barang yang harus segera ditambah.
+[P392][Normal] 
+[P393][Caption] Gambar 4.13 Halaman Data Pengguna
+[P394][Normal] Pada Gambar 4.13 terlihat halaman data pengguna yang digunakan admin untuk menambahkan akun admin dan kasir. Form pengguna memuat nama, username, role, password, dan email opsional. Bagian daftar user menampilkan akun yang aktif beserta perannya sehingga pembagian akses antara admin dan kasir dapat dikelola dengan lebih terstruktur.
+[P395][List Paragraph] Construction of protype
+[P396][Normal] Construction of prototype pada tahap pertama menghasilkan rancangan fungsi dasar, yaitu pencatatan data barang, supplier, dan transaksi sederhana. Hasil evaluasi menunjukkan bahwa pengguna membutuhkan penyempurnaan pada master kategori dan satuan, detail transaksi, cetak ulang struk, serta laporan yang dapat diekspor ke PDF.
+[P397][Normal] 
+[P398][Caption] Gambar 4.14 Halaman Kategori dan Satuan Barang
+[P399][Normal] Pada Gambar 4.14 terlihat halaman master data kategori dan satuan barang. Fitur ini digunakan untuk menambahkan kategori barang, seperti struktur, finishing dan cat, perkakas, plumbing dan pipa, serta material dasar. Selain itu, admin dapat menambahkan satuan barang seperti box, kg, kaleng, meter, sak, pcs, liter, dan dus agar pencatatan stok menjadi lebih konsisten.
+[P400][Normal] 
+[P401][Caption] Gambar 4.15 Halaman Detail Transaksi
+[P402][Normal] Pada Gambar 4.15 terlihat tampilan detail transaksi yang muncul dalam bentuk jendela dialog. Detail transaksi menampilkan nomor transaksi, tanggal, subtotal, diskon, total, nominal bayar, kembalian, serta daftar barang yang dibeli. Fitur ini membantu admin atau kasir memeriksa kembali isi transaksi yang sudah tersimpan.
+[P403][Normal] 
+[P404][Caption] Gambar 4.16 Halaman Cetak Ulang Struk
+[P405][Normal] Pada Gambar 4.16 terlihat fitur cetak ulang struk dari transaksi yang telah tersimpan. Struk menampilkan logo toko, nomor transaksi, tanggal, daftar barang, subtotal, diskon, total, nominal bayar, dan kembalian. Fitur ini diperlukan apabila pelanggan membutuhkan nota kembali setelah transaksi selesai dilakukan.
+[P406][Normal] 
+[P407][Caption] Gambar 4.17 Halaman PDF Laporan
+[P408][Normal] Pada Gambar 4.17 terlihat hasil ekspor laporan dalam format PDF. Laporan PDF menampilkan identitas toko, logo, ringkasan data, dan tabel laporan sesuai jenis laporan yang dipilih. Perbaikan pada fitur ini memastikan transaksi terbaru ikut muncul pada laporan dan logo toko tampil pada dokumen hasil ekspor.
+[P409][Heading 3] Prototype 2
+[P410][Normal] Prototype kedua dikembangkan berdasarkan umpan balik dari prototype pertama. Pada tahap ini sistem disempurnakan dengan fitur master kategori, master satuan, laporan PDF yang menampilkan transaksi terbaru, logo pada laporan PDF, menu keuangan, rincian transaksi harian, detail transaksi kasir, dan cetak ulang struk.
+[P411][Normal] Tahap modeling quick design pada prototype kedua difokuskan pada pemodelan alur transaksi dan struktur class aplikasi. Sequence diagram digunakan untuk menggambarkan urutan proses transaksi dari kasir hingga data tersimpan ke database, sedangkan class diagram digunakan untuk memperlihatkan hubungan model Laravel yang digunakan pada sistem.
+[P412][Normal] 
+[P413][Caption] Gambar 4.18 Sequence Diagram Transaksi Penjualan
+[P414][Normal] Pada Gambar 4.18, proses transaksi dimulai ketika kasir memilih barang dan mengirim permintaan checkout. Controller melakukan validasi input, memeriksa stok, menyimpan data penjualan, menyimpan item penjualan, mengurangi stok barang, lalu mengirimkan data terbaru ke antarmuka pengguna.
+[P415][Normal] 
+[P416][Caption] Gambar 4.19 Class Diagram Sistem
+[P417][Normal] Gambar 4.19 menunjukkan class utama yang digunakan, antara lain PosController, PosBootstrapService, User, Supplier, InventoryItem, InventoryCategory, InventoryUnit, GoodsReceipt, Sale, SaleItem, Customer, DebtPayment, VoidLog, ReturnRequest, ReturnItem, StockOpname, StockOpnameItem, dan Setting. Relasi utama yang terbentuk adalah barang memiliki supplier, barang memiliki riwayat barang masuk, transaksi penjualan memiliki banyak item penjualan, setiap item penjualan mengacu pada barang persediaan, pelanggan memiliki riwayat transaksi dan hutang, void log mencatat riwayat pembatalan transaksi, retur mencatat pengembalian barang, stok opname mencatat hasil pencocokan stok fisik dengan stok sistem, dan setting menyimpan konfigurasi toko.
+[P418][Heading 3] Implementasi Database MySQL
+[P419][Normal] Implementasi database menggunakan MySQL. Struktur database dirancang untuk menyimpan data pengguna, data master persediaan, supplier, barang masuk, transaksi penjualan, detail penjualan, pelanggan, hutang piutang, void transaksi, retur penjualan, stok opname, session, cache, dan queue. Relasi antar tabel dibuat agar perubahan stok dan transaksi dapat tercatat secara konsisten. Sistem memiliki 15 tabel utama yang saling terintegrasi untuk mendukung seluruh proses operasional toko.
+[P420][Normal] 
+[P421][Caption] Gambar 4.20 ERD Database Sistem
+[P422][Normal] Pada Gambar 4.20 terlihat rancangan ERD database sistem yang menggambarkan relasi tabel users, suppliers, inventory_categories, inventory_units, inventory_items, goods_receipts, sales, sale_items, customers, debt_payments, void_logs, return_requests, return_items, stock_opnames, stock_opname_items, dan settings. Relasi tersebut digunakan untuk mencatat akun pengguna, data master, pemasok, stok barang, barang masuk, transaksi penjualan, detail barang yang dibeli, data pelanggan, riwayat pembayaran hutang, log pembatalan transaksi, pengembalian barang, hasil opname stok, serta konfigurasi aplikasi.
+[P423][Normal] Tabel 4.1 Implementasi Database MySQL
+[P424][Normal] 
+[P425][Normal] Berdasarkan Tabel 4.1, tabel inventory_items menjadi pusat data persediaan karena menyimpan informasi barang dan stok. Tabel goods_receipts digunakan untuk menambah stok saat barang masuk, sedangkan sales dan sale_items digunakan untuk mencatat transaksi penjualan sekaligus mengurangi stok barang. Tabel customers menyimpan data pelanggan untuk keperluan pencatatan transaksi dan hutang piutang. Tabel debt_payments mencatat riwayat pembayaran cicilan hutang pelanggan. Tabel void_logs menyimpan riwayat pembatalan transaksi berikut alasan pembatalan. Tabel return_requests dan return_items mencatat pengembalian barang dan refund. Tabel stock_opnames dan stock_opname_items mencatat hasil opname beserta penyesuaian stok. Tabel settings menyimpan konfigurasi umum toko seperti nama toko, alamat, dan metode pembayaran yang tersedia.
+[P426][Heading 3] Implementasi Fungsional Sistem
+[P427][Normal] Implementasi fungsional sistem menerapkan arsitektur MVC pada Laravel. Model digunakan untuk merepresentasikan tabel database, controller digunakan untuk memproses request, validasi, transaksi database, dan pembuatan laporan, sedangkan view digunakan sebagai antarmuka pengguna pada halaman.
+[P428][Normal] Pada bagian model, sistem memiliki model User, Supplier, InventoryItem, InventoryCategory, InventoryUnit, GoodsReceipt, Sale, SaleItem, Customer, DebtPayment, VoidLog, ReturnRequest, ReturnItem, StockOpname, StockOpnameItem, dan Setting. Model InventoryItem digunakan untuk data barang dan stok, model GoodsReceipt untuk barang masuk, model Sale untuk transaksi penjualan, model SaleItem untuk rincian barang yang terjual, model Customer untuk data pelanggan, model DebtPayment untuk riwayat pembayaran hutang, model VoidLog untuk mencatat pembatalan transaksi, model ReturnRequest dan ReturnItem untuk pengembalian barang, model StockOpname dan StockOpnameItem untuk pencatatan opname stok, serta model Setting untuk konfigurasi toko.
+[P429][Normal] Pada bagian view, sistem menyediakan halaman dashboard, master data, barang masuk, transaksi kasir, aktivitas kasir, rincian data, void transaksi, retur penjualan, stok opname, data pelanggan, hutang piutang, laporan, dan keuangan. Dashboard menampilkan ringkasan stok minimum, total barang, transaksi hari ini, serta perbandingan pendapatan hari ini dengan hari kemarin. Jika pendapatan hari ini lebih kecil dari hari kemarin, sistem menampilkan nilai selisih negatif; jika lebih besar, sistem menampilkan nilai selisih positif.
+[P430][Normal] Pada bagian controller, PosController menangani proses login, logout, bootstrap data, CRUD barang, CRUD supplier, tambah kategori, tambah satuan, barang masuk, checkout penjualan, void transaksi, retur penjualan, stok opname, CRUD pelanggan, catat bayar hutang, reset data demo, serta export laporan PDF. Pada proses checkout, sistem menggunakan transaksi database agar penyimpanan penjualan dan pengurangan stok berjalan konsisten. Void transaksi membatalkan penjualan dan mengembalikan stok ke jumlah semula. Retur penjualan mengembalikan barang dari pelanggan dengan mencatat refund dan menambah stok. Stok opname memungkinkan admin menyesuaikan stok sistem berdasarkan hasil pengecekan fisik.
+[P431][Normal] Fitur laporan harian disempurnakan agar transaksi terbaru ikut muncul pada export PDF. Selain itu, logo toko ditampilkan pada hasil export PDF sehingga laporan memiliki identitas toko yang jelas. Menu keuangan ditambahkan untuk menampilkan pendapatan, pengeluaran, keuntungan, margin, dan data lengkap keuangan toko.
+[P432][Normal] Pada aktivitas kasir, pengguna dapat melihat detail transaksi yang sudah terjadi dan melakukan cetak ulang struk. Pada rincian data, transaksi harian juga dapat dibuka untuk melihat daftar item, jumlah, harga, diskon, total, nominal bayar, dan kembalian.
+[P433][Heading 3] Deployment Delivery & Feedback
+[P434][Normal] Tahap deployment dilakukan dengan menyiapkan aplikasi agar dapat dijalankan pada lingkungan server yang mendukung PHP, Composer, Node.js, dan MySQL. Pada tahap lokal, aplikasi dijalankan melalui Laravel dengan konfigurasi database MySQL. Untuk hosting produksi, sistem membutuhkan layanan yang mendukung PHP dan MySQL agar fitur transaksi, laporan, session, dan penyimpanan database dapat berjalan normal.
+[P435][Normal] Tahap delivery dilakukan dengan menyerahkan aplikasi kepada pengguna untuk dicoba pada proses operasional toko. Feedback dari pengguna digunakan untuk memperbaiki kebutuhan tambahan, seperti master kategori dan satuan, detail transaksi, cetak ulang struk, laporan PDF, serta menu keuangan. Perbaikan tersebut kemudian dimasukkan ke prototype kedua agar sistem lebih sesuai dengan kebutuhan nyata toko.
+[P436][Heading 2] Pengujian Sistem
+[P437][Normal] Pengujian sistem dilakukan untuk memastikan fitur yang dikembangkan dapat berjalan sesuai kebutuhan pengguna. Metode pengujian yang digunakan adalah Black Box Testing dan User Acceptance Testing (UAT). Black Box Testing berfokus pada fungsi sistem berdasarkan input dan output, sedangkan UAT berfokus pada penerimaan pengguna terhadap kemudahan dan kesesuaian sistem.
+[P438][Heading 3] Pengujian Blackbox Testing
+[P439][Normal] Pengujian Black Box dilakukan pada fitur utama yang digunakan dalam operasional toko. Setiap fitur diuji berdasarkan skenario penggunaan, hasil yang diharapkan, hasil aktual, dan status pengujian.
+[P440][Normal] Tabel 4. Pengujian Blackbox
+[P441][Normal] 
+[P442][Normal] Berdasarkan Tabel 4.2, seluruh fitur utama yang diuji mendapatkan status valid. Hal ini menunjukkan bahwa sistem telah memenuhi kebutuhan fungsional utama, khususnya pada pengelolaan persediaan, transaksi kasir, laporan, dan keuangan toko.
+[P443][Heading 3] Pengujian UAT
+[P444][Normal] Pengujian UAT dilakukan untuk melihat penerimaan pengguna terhadap sistem. Aspek yang dinilai meliputi kemudahan penggunaan, kesesuaian fitur dengan kebutuhan toko, kejelasan informasi, dan manfaat sistem terhadap pencatatan operasional.
+[P445][Caption] Tabel 4.3 Pengujian UAT
+[P446][Normal] 
+[P447][Normal] 
+[P448][Heading 1] 
+KESIMPULAN DAN PENELITIAN SELANJUTNYA
+[P449][Normal] Pada bab ini dijelaskan kesimpulan dari penelitian yang dilakukan oleh penulis mengenai rancang bangun sistem informasi penataan persediaan barang penjualan pada TB. Losari Jaya 2 dengan metode prototyping berbasis website. Selain itu, bab ini juga memuat rekomendasi yang dapat digunakan sebagai bahan pertimbangan untuk penelitian dan pengembangan sistem selanjutnya.
+[P450][Heading 2] Kesimpulan
+[P451][Normal] Berdasarkan penelitian yang telah dilakukan, diperoleh beberapa kesimpulan yang menjawab rumusan masalah dan tujuan penelitian. Kesimpulan tersebut antara lain sebagai berikut:
+[P452][Normal] 1.	Sistem informasi penataan persediaan barang penjualan berbasis website pada TB. Losari Jaya 2 berhasil dirancang dan dibangun menggunakan framework Laravel dengan basis data MySQL. Sistem ini membantu proses pencatatan data barang, kategori, satuan, supplier, barang masuk, transaksi penjualan, laporan, dan informasi keuangan toko menjadi lebih terstruktur.
+[P453][Normal] 2.	Penerapan metode prototyping membantu proses pengembangan sistem karena kebutuhan pengguna dapat diidentifikasi secara bertahap melalui komunikasi, perencanaan, pemodelan, pembangunan prototype, serta evaluasi melalui feedback pengguna. Hasil feedback tersebut menjadi dasar penambahan fitur master kategori dan satuan, detail transaksi, cetak ulang struk, laporan PDF, serta menu keuangan.
+[P454][Normal] 3.	Fitur kasir yang dikembangkan mampu mendukung proses transaksi penjualan, mulai dari pencarian barang, pemilihan barang ke keranjang, perhitungan subtotal, diskon, total, nominal bayar, kembalian, penyimpanan transaksi, hingga pengurangan stok barang secara otomatis.
+[P455][Normal] 4.	Fitur admin mampu membantu pengelolaan operasional toko melalui dashboard, master data barang, supplier, barang masuk, void transaksi, retur penjualan, stok opname, data pelanggan, hutang piutang, laporan penjualan, laporan stok barang, rincian transaksi harian, data pengguna, serta data keuangan yang memuat pendapatan, pengeluaran, keuntungan, dan margin.
+[P456][Normal] 5.	Berdasarkan hasil pengujian Black Box dan UAT, fitur utama sistem memperoleh hasil valid dan dapat diterima oleh pengguna. Hal ini menunjukkan bahwa sistem telah sesuai dengan kebutuhan operasional toko, mengurangi pencatatan manual, mempercepat pencarian data barang, memperjelas transaksi penjualan, dan menyajikan laporan yang lebih mudah dibaca.
+[P457][Heading 2] Penelitian Selanjutnya
+[P458][Normal] Berdasarkan hasil penelitian yang telah dilakukan, penulis memberikan beberapa rekomendasi yang dapat dijadikan pertimbangan untuk penelitian selanjutnya. Beberapa saran tersebut antara lain sebagai berikut:
+[P459][Normal] 1.	Sistem dapat dikembangkan dengan fitur notifikasi stok minimum dan rekomendasi restock agar admin dapat mengetahui barang yang perlu segera ditambah sebelum stok habis.
+[P460][Normal] 2.	Pengembangan berikutnya dapat menambahkan fitur barcode scanner atau QR code untuk mempercepat proses input barang dan transaksi kasir, terutama ketika jumlah barang semakin banyak.
+[P461][Normal] 3.	Sistem dapat dikembangkan dengan integrasi API untuk menghubungkan dengan platform e-commerce dan sistem akuntansi, sehingga data stok dan penjualan dapat disinkronkan secara otomatis antar platform.
+[P462][Normal] 4.	Keamanan sistem dapat ditingkatkan dengan fitur reset password, pengaturan hak akses yang lebih rinci, pencatatan log aktivitas pengguna, serta backup database secara berkala untuk mengurangi risiko kehilangan data.
+[P463][Normal] 5.	Penelitian selanjutnya dapat mengembangkan sistem ke versi mobile atau Progressive Web App (PWA) serta melakukan pengujian dengan jumlah pengguna dan data transaksi yang lebih besar agar performa dan kegunaan sistem dapat dievaluasi secara lebih menyeluruh.
+[P464][Heading 1] DAFTAR PUSTAKA
+[P465][Normal] Adikusuma, R. W., Rachman, A., Sulistyowati, FAhrurrozi, N., Sulistrowati, R., & Alala, P. S. (2025). Rancang Bangun Sistem Informasi Penjualan Toko Src Bu Herlin Berbasis Web Dengan Model Prototype. SNESTIK Seminar Nasional Teknik Elektro, Sistem Informasi, Dan Teknik Informatika, 707–716.
+[P466][Normal] Ahmad, U. Al, Rachman, A., Sulistyowati, Sujono, H. A., Sulistyowati, R., Alala, P. S., & Susilowati, A. G. (2024). Rancang Bangun Aplikasi Stok Opname Berbasis Website Menggunakan Model Prototype. Teknik Informatika – Institut Teknologi Adhi Tama Surabaya1 Sistem Informasi – Institut Teknologi Adhi Tama Surabaya2, Teknik Elektro – Institut Teknologi Adhi Tama Surabaya3, Teknik Pertambangan – Institut Teknologi Adhi Tama Surabaya4, Informatika – Uni, 1–11.
+[P467][Normal] Effendi, D., & Noviansyah, B. (2018). Rancang bangun sistem informasi manajemen persediaan barang di suhuf kertaseni nusantara bandung. JIPI (Jurnal Ilmiah Penelitian Dan Pembelajaran Informatika), 03, 17–23.
+[P468][Normal] Gultom, H. (2022). RANCANG BANGUN SISTEM INFORMASI STOK BARANG UNTUK MEMANTAU KETERSEDIAAN BARANG DAGANG. Scientia Sacra: Jurnal Sains, Teknologi Dan Masyarakat, 2(3), 263–270.
+[P469][Normal] Widiatma, C. A., & Abdillah, L. (2025). Rancangan Sistem Informasi Inventory Penjualan Berbasis Web pada Toko Yuda Pasar Inpres Kecamatan Kelapa Gading. Jurnal Sains, Bisnis Dan Teknologi, 11(1), 108–117.
+[P470][Normal] 
+[P471][Normal] 
+[P472][Normal] 
+
+
+=== TABLES ===
+
+--- Table 0 ---
+Nama | : | Muhammad Bagja Satrio
+NIM | : | A11.2022.14694
+Program Studi | : | Teknik Informatika
+Fakultas | : | Ilmu Komputer
+Judul Tugas Akhir | : | Penjadwalan Sidang Tugas Akhir menggunakan Algoritma Genetika pada Universitas Dian Nuswantoro Semarang 
+
+--- Table 1 ---
+	Menyetujui: | 	Mengetahui:
+	Pembimbing | 	Dekan Fakultas Ilmu Komputer
+
+
+
+CAHAYA JATMOKO M.Kom | Dr. Abdul Syukur
+
+--- Table 2 ---
+Nama | : | Danang Wahyu Utomo
+NIM | : | A11.2024.16000
+Program Studi | : | Teknik Informatika
+Fakultas | : | Ilmu Komputer
+Judul Tugas Akhir | : | Penjadwalan Sidang Tugas Akhir menggunakan Algoritma Genetika pada Universitas Dian Nuswantoro Semarang 
+
+--- Table 3 ---
+
+
+
+ | 
+Adhitya Nugraha, S.Kom, M.CS | Ardytha Luthfiarta, M.Kom
+Anggota Penguji 1 | Anggota Penguji 2
+
+
+
+ | 
+
+
+
+Sri Winarno, Ph.D | Sri Winarno, Ph.D
+Ketua Penguji | Ketua Penguji

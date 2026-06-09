@@ -178,4 +178,58 @@ class InventoryMasterTest extends TestCase
             ->postJson(route('pos.categories.store'), ['name' => 'Admin Only'])
             ->assertForbidden();
     }
+
+    public function test_admin_can_void_sale_and_stock_is_restored(): void
+    {
+        $seederService = app(PosDemoSeederService::class);
+        $admin = $seederService->resetAndSeed();
+
+        $sale = Sale::firstOrFail();
+        $saleItem = $sale->items->firstOrFail();
+        $item = InventoryItem::query()->findOrFail($saleItem->inventory_item_id);
+        $stockBefore = (float) $item->stock;
+
+        $this->actingAs($admin)
+            ->postJson(route('pos.sales.void', ['sale' => $sale->invoice_number]), [
+                'reason' => 'Test void: kesalahan input item.',
+            ])
+            ->assertOk()
+            ->assertJsonPath('message', 'Transaksi berhasil dibatalkan. Stok barang sudah dikembalikan.');
+
+        $sale->refresh();
+        $this->assertEquals('void', $sale->status);
+        $this->assertNotNull($sale->voided_at);
+        $this->assertEquals($admin->id, $sale->voided_by);
+        $this->assertEquals('Test void: kesalahan input item.', $sale->void_reason);
+
+        $item->refresh();
+        $expectedStock = $stockBefore + (float) $saleItem->quantity;
+        $this->assertEquals($expectedStock, (float) $item->stock);
+
+        $voidLog = $sale->voidLog()->first();
+        $this->assertNotNull($voidLog);
+        $this->assertEquals('Test void: kesalahan input item.', $voidLog->reason);
+        $this->assertEquals($admin->id, $voidLog->user_id);
+        $this->assertNotNull($voidLog->restored_items);
+
+        $this->actingAs($admin)
+            ->postJson(route('pos.sales.void', ['sale' => $sale->invoice_number]), [
+                'reason' => 'Mencoba void ulang.',
+            ])
+            ->assertStatus(422);
+
+        $cashier = User::query()->create([
+            'name' => 'Cashier Void',
+            'username' => 'cashier-void',
+            'role' => User::ROLE_CASHIER,
+            'email' => 'cashier-void@example.test',
+            'password' => Hash::make('password'),
+        ]);
+
+        $this->actingAs($cashier)
+            ->postJson(route('pos.sales.void', ['sale' => $sale->invoice_number]), [
+                'reason' => 'Cashier mencoba void.',
+            ])
+            ->assertForbidden();
+    }
 }

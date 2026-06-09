@@ -20,6 +20,7 @@ class InventoryItem extends Model
         'stock',
         'min_stock',
         'price',
+        'purchase_price',
         'description',
     ];
 
@@ -29,6 +30,7 @@ class InventoryItem extends Model
             'stock' => 'decimal:3',
             'min_stock' => 'decimal:3',
             'price' => 'integer',
+            'purchase_price' => 'integer',
         ];
     }
 

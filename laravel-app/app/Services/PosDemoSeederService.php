@@ -2,10 +2,14 @@
 
 namespace App\Services;
 
+use App\Models\Customer;
+use App\Models\DebtPayment;
 use App\Models\GoodsReceipt;
 use App\Models\InventoryCategory;
 use App\Models\InventoryItem;
 use App\Models\InventoryUnit;
+use App\Models\ReturnItem;
+use App\Models\ReturnRequest;
 use App\Models\Sale;
 use App\Models\SaleItem;
 use App\Models\Supplier;
@@ -21,13 +25,17 @@ class PosDemoSeederService
     {
         Schema::disableForeignKeyConstraints();
         try {
+            DebtPayment::query()->delete();
             SaleItem::query()->delete();
             Sale::query()->delete();
+            ReturnItem::query()->delete();
+            ReturnRequest::query()->delete();
             GoodsReceipt::query()->delete();
             InventoryItem::query()->delete();
             Supplier::query()->delete();
             InventoryCategory::query()->delete();
             InventoryUnit::query()->delete();
+            Customer::query()->delete();
         } finally {
             Schema::enableForeignKeyConstraints();
         }
@@ -92,6 +100,7 @@ class PosDemoSeederService
 
         $this->seedGoodsReceipts($inventoryItems, $supplier);
         $this->seedSales($inventoryItems, $admin);
+        $this->seedCustomersAndDebts($admin);
 
         return $admin->fresh();
     }
@@ -316,5 +325,78 @@ class PosDemoSeederService
     private function roundUpTo(int|float $value, int $step): int
     {
         return (int) (ceil($value / $step) * $step);
+    }
+
+    private function seedCustomersAndDebts(User $admin): void
+    {
+        $customers = collect([
+            ['name' => 'Budi Santoso', 'phone' => '08123456789', 'address' => 'Jl. Merdeka No. 45, Kota'],
+            ['name' => 'Siti Rahmawati', 'phone' => '08567890123', 'address' => 'Perumahan Indah Blok A.12'],
+            ['name' => 'H. Ahmad Dahlan', 'phone' => '08789012345', 'address' => 'Jl. Diponegoro No. 100'],
+        ])->map(fn (array $data) => Customer::query()->create($data));
+
+        $sales = Sale::query()
+            ->orderBy('sold_at')
+            ->limit(4)
+            ->get();
+
+        if ($sales->count() < 4) {
+            return;
+        }
+
+        // Sale 0 → Budi, no payment yet (full debt)
+        $sales[0]->update([
+            'payment_method' => 'hutang',
+            'customer_id' => $customers[0]->id,
+            'customer_name' => $customers[0]->name,
+            'payment_amount' => 0,
+            'change_amount' => 0,
+        ]);
+
+        // Sale 1 → Siti, partial payment (dp)
+        $sales[1]->update([
+            'payment_method' => 'hutang',
+            'customer_id' => $customers[1]->id,
+            'customer_name' => $customers[1]->name,
+            'payment_amount' => (int) round($sales[1]->total * 0.3),
+            'change_amount' => 0,
+        ]);
+
+        DebtPayment::query()->create([
+            'customer_id' => $customers[1]->id,
+            'sale_id' => $sales[1]->id,
+            'amount' => $sales[1]->payment_amount,
+            'paid_at' => $sales[1]->sold_at,
+            'recorded_by' => $admin->id,
+            'note' => 'DP awal 30%',
+        ]);
+
+        // Sale 2 → Ahmad, paid off later via debt payment (0 cash at register)
+        $sales[2]->update([
+            'payment_method' => 'hutang',
+            'customer_id' => $customers[2]->id,
+            'customer_name' => $customers[2]->name,
+            'payment_amount' => 0,
+            'change_amount' => 0,
+        ]);
+
+        DebtPayment::query()->create([
+            'customer_id' => $customers[2]->id,
+            'sale_id' => $sales[2]->id,
+            'amount' => $sales[2]->total,
+            'paid_at' => $sales[2]->sold_at->copy()->addDay(),
+            'recorded_by' => $admin->id,
+            'note' => 'Lunas via transfer',
+        ]);
+
+        // Sale 3 → Budi, DP 50% at register, remaining 50% still outstanding
+        $sales[3]->update([
+            'payment_method' => 'hutang',
+            'customer_id' => $customers[0]->id,
+            'customer_name' => $customers[0]->name,
+            'payment_amount' => (int) round($sales[3]->total * 0.5),
+            'change_amount' => 0,
+        ]);
+        // No debt payment — Budi still owes the other 50%
     }
 }

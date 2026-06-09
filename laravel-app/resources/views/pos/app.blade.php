@@ -145,9 +145,29 @@
           <span class="material-symbols-outlined">group_add</span>
           <span>Pengguna</span>
         </button>
+        <button class="nav-item" data-nav="customers">
+          <span class="material-symbols-outlined">group</span>
+          <span>Pelanggan</span>
+        </button>
+        <button class="nav-item" data-nav="void">
+          <span class="material-symbols-outlined">block</span>
+          <span>Void Transaksi</span>
+        </button>
+        <button class="nav-item" data-nav="returns">
+          <span class="material-symbols-outlined">assignment_return</span>
+          <span>Retur Penjualan</span>
+        </button>
+        <button class="nav-item" data-nav="opnames">
+          <span class="material-symbols-outlined">fact_check</span>
+          <span>Stok Opname</span>
+        </button>
       </nav>
 
       <div class="sidebar-foot">
+        <button id="changePasswordBtn" class="button button-muted button-block" type="button">
+          <span class="material-symbols-outlined">lock</span>
+          Ganti Password
+        </button>
         <button id="resetDemoBtn" class="button button-muted button-block" type="button">
           <span class="material-symbols-outlined">refresh</span>
           Reset Data
@@ -357,6 +377,8 @@
                       <th>Kategori</th>
                       <th>Supplier</th>
                       <th>Stok</th>
+                      <th>Harga Beli</th>
+                      <th>Laba</th>
                       <th>Harga Dasar</th>
                       <th>Harga Toko</th>
                       <th>Harga Eceran</th>
@@ -569,13 +591,48 @@
                   <strong id="cartTotal">Rp 0</strong>
                 </div>
 
-                <div class="payment-box">
+                <div class="payment-method-select" id="paymentMethodSelect">
+                  <label class="field">
+                    <span>Metode Pembayaran</span>
+                    <select id="paymentMethodInput">
+                      <option value="tunai">Tunai</option>
+                      <option value="qris">QRIS</option>
+                      <option value="va">Transfer / Virtual Account</option>
+                      <option value="hutang">Hutang / Kredit</option>
+                    </select>
+                  </label>
+                </div>
+
+                <!-- Hutang: customer + DP fields -->
+                <div id="hutangFields" class="hutang-fields hidden">
+                  <div class="hutang-customer-field">
+                    <label class="field field-full" style="position:relative">
+                      <span>Nama Pelanggan <em style="color:var(--danger,#ef4444)">*</em></span>
+                      <input id="hutangCustomerInput" type="text" placeholder="Cari atau ketik nama pelanggan..." autocomplete="off">
+                      <div id="customerAutocomplete" class="customer-autocomplete hidden"></div>
+                    </label>
+                  </div>
+                  <label class="field field-full">
+                    <span>No. HP</span>
+                    <input id="hutangPhoneInput" type="text" placeholder="Nomor telepon" autocomplete="tel">
+                  </label>
+                  <label class="field field-full">
+                    <span>Alamat</span>
+                    <textarea id="hutangAddressInput" rows="2" placeholder="Alamat lengkap"></textarea>
+                  </label>
+                  <label class="field field-full">
+                    <span>DP / Bayar Muka <em style="color:var(--text-tertiary)">(opsional, Rp 0 = full kredit)</em></span>
+                    <input id="hutangDpInput" type="text" value="0" inputmode="numeric" placeholder="0">
+                  </label>
+                </div>
+
+                <div class="payment-box" id="paymentBoxTunai">
                   <div class="payment-box-head">
-                    <span>Tunai (Cash)</span>
+                    <span>Uang Tunai</span>
                     <button id="exactCashBtn" class="button-link" type="button">Pas</button>
                   </div>
                   <label class="field">
-                    <span>Uang Bayar</span>
+                    <span>Jumlah Bayar</span>
                     <input id="paymentInput" type="text" value="0" inputmode="numeric">
                   </label>
                   <div class="summary-line">
@@ -584,16 +641,36 @@
                   </div>
                 </div>
 
-                <div class="cart-actions">
-                  <button id="printReceiptBtn" class="button button-soft" type="button">
-                    <span class="material-symbols-outlined">receipt_long</span>
-                    Cetak
+                <!-- Bukti Pembayaran Upload -->
+                <div class="proof-upload-wrap" id="proofUploadWrap">
+                  <input id="proofFileInput" type="file" accept="image/jpeg,image/png,image/webp" class="hidden">
+                  <div id="proofPreview" class="proof-preview hidden">
+                    <img id="proofPreviewImg" class="proof-thumb" alt="Bukti bayar">
+                    <div class="proof-meta">
+                      <span id="proofFileName" class="proof-name"></span>
+                      <small id="proofFileSize" class="proof-size"></small>
+                    </div>
+                    <button id="proofClearBtn" class="icon-button" type="button" aria-label="Hapus foto">
+                      <span class="material-symbols-outlined">close</span>
+                    </button>
+                  </div>
+                  <button id="proofUploadBtn" class="button button-soft button-block" type="button">
+                    <span class="material-symbols-outlined">upload_file</span>
+                    Lampirkan Bukti Bayar
                   </button>
-                  <button id="checkoutBtn" class="button button-success" type="button">
-                    <span class="material-symbols-outlined">payments</span>
-                    Bayar
-                  </button>
+                  <small class="proof-hint">Opsional &middot; JPG, PNG, WebP &middot; Otomatis dikompres maks 200 KB</small>
                 </div>
+              </div>
+
+              <div class="cart-actions">
+                <button id="printReceiptBtn" class="button button-soft" type="button">
+                  <span class="material-symbols-outlined">receipt_long</span>
+                  Cetak
+                </button>
+                <button id="checkoutBtn" class="button button-success" type="button">
+                  <span class="material-symbols-outlined">payments</span>
+                  Bayar
+                </button>
               </div>
             </aside>
           </div>
@@ -628,6 +705,17 @@
                 <span>Total Pengeluaran</span>
                 <strong id="financeExpense">Rp 0</strong>
                 <small id="financeExpenseHint">0 transaksi barang masuk tercatat</small>
+              </div>
+            </article>
+
+            <article class="metric-card">
+              <div class="metric-icon metric-success">
+                <span class="material-symbols-outlined">monetization_on</span>
+              </div>
+              <div class="metric-copy">
+                <span>Laba Kotor Per Item</span>
+                <strong id="financeGrossProfit">Rp 0</strong>
+                <small id="financeGrossProfitHint">Selisih harga jual dikurangi harga beli</small>
               </div>
             </article>
 
@@ -749,6 +837,7 @@
                       <th>Nama</th>
                       <th>Username</th>
                       <th>Role</th>
+                      <th class="align-right">Aksi</th>
                     </tr>
                   </thead>
                   <tbody id="userTableBody"></tbody>
@@ -756,6 +845,178 @@
               </div>
             </article>
           </div>
+        </section>
+
+        <div id="userModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="userModalTitle">
+          <div id="userModalBackdrop" class="modal-backdrop"></div>
+          <div class="modal-card surface-panel user-modal-card">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Manajemen Pengguna</p>
+                <h4 id="userModalTitle">Edit User</h4>
+              </div>
+              <button id="closeUserModalBtn" class="icon-button" type="button" aria-label="Tutup modal user">
+                <span class="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <form id="userEditForm" class="form-grid">
+              <input id="userEditId" name="id" type="hidden">
+
+              <label class="field">
+                <span>Nama</span>
+                <input id="userEditName" name="name" type="text" placeholder="Contoh: Kasir Pagi" required>
+              </label>
+
+              <label class="field">
+                <span>Username</span>
+                <input id="userEditUsername" name="username" type="text" placeholder="kasir_pagi" autocomplete="off" required>
+              </label>
+
+              <label class="field">
+                <span>Role</span>
+                <select id="userEditRole" name="role" required>
+                  <option value="cashier">Kasir</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </label>
+
+              <label class="field">
+                <span>Password <em>(opsional)</em></span>
+                <input id="userEditPassword" name="password" type="password" placeholder="Kosongkan jika tidak diganti" autocomplete="new-password">
+                <small style="color:var(--text-tertiary);font-size:0.65rem;">Minimal 6 karakter. Isi hanya jika ingin ganti password.</small>
+              </label>
+
+              <label class="field field-full">
+                <span>Email Opsional</span>
+                <input id="userEditEmail" name="email" type="email" placeholder="contoh@domain.com">
+              </label>
+
+              <div class="field-full modal-actions">
+                <button id="cancelUserModalBtn" class="button button-muted" type="button">Batal</button>
+                <button class="button button-primary" type="submit">
+                  <span class="material-symbols-outlined">save</span>
+                  Simpan Perubahan
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div id="passwordModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="passwordModalTitle">
+          <div id="passwordModalBackdrop" class="modal-backdrop"></div>
+          <div class="modal-card surface-panel password-modal-card">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Keamanan Akun</p>
+                <h4 id="passwordModalTitle">Ganti Password</h4>
+                <small>Masukkan password saat ini dan password baru Anda.</small>
+              </div>
+              <button id="closePasswordModalBtn" class="icon-button" type="button" aria-label="Tutup">
+                <span class="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <form id="passwordForm" class="form-grid">
+              <label class="field field-full">
+                <span>Password Saat Ini</span>
+                <input id="passwordCurrent" name="current_password" type="password" placeholder="Masukkan password saat ini" autocomplete="current-password" required>
+              </label>
+
+              <label class="field">
+                <span>Password Baru</span>
+                <input id="passwordNew" name="new_password" type="password" placeholder="Minimal 6 karakter" autocomplete="new-password" required>
+              </label>
+
+              <label class="field">
+                <span>Konfirmasi Password Baru</span>
+                <input id="passwordConfirm" name="confirm_password" type="password" placeholder="Ulangi password baru" autocomplete="new-password" required>
+              </label>
+
+              <div class="field-full modal-actions">
+                <button id="cancelPasswordBtn" class="button button-muted" type="button">Batal</button>
+                <button class="button button-primary" type="submit">
+                  <span class="material-symbols-outlined">lock</span>
+                  Simpan Password
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <section class="page" data-view="void">
+          <div class="page-head">
+            <div>
+              <p class="eyebrow">Manajemen Void</p>
+              <h3>Pembatalan transaksi dan riwayat void.</h3>
+              <p>Batalkan transaksi, pulihkan stok, dan pantau riwayat pembatalan secara lengkap.</p>
+            </div>
+          </div>
+
+          <div class="metric-grid" id="voidAnalyticsGrid">
+            <article class="metric-card metric-card-large">
+              <div class="metric-icon metric-danger">
+                <span class="material-symbols-outlined">block</span>
+              </div>
+              <div class="metric-copy">
+                <span>Total Transaksi Void</span>
+                <strong id="voidTotalCount">0</strong>
+                <small id="voidTotalHint">Riwayat pembatalan transaksi</small>
+              </div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-icon metric-danger">
+                <span class="material-symbols-outlined">money_off</span>
+              </div>
+              <div class="metric-copy">
+                <span>Total Nominal Void</span>
+                <strong id="voidTotalNominal">Rp 0</strong>
+                <small id="voidNominalHint">Nilai transaksi yang dibatalkan</small>
+              </div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-icon metric-neutral">
+                <span class="material-symbols-outlined">restore</span>
+              </div>
+              <div class="metric-copy">
+                <span>Item Stok Dikembalikan</span>
+                <strong id="voidRestoredCount">0</strong>
+                <small id="voidRestoredHint">Total item stok yang diretur</small>
+              </div>
+            </article>
+          </div>
+
+          <div class="toolbar surface-strip">
+            <label class="search-field">
+              <span class="material-symbols-outlined">search</span>
+              <input id="voidSearch" type="text" placeholder="Cari invoice, alasan, atau petugas void...">
+            </label>
+          </div>
+
+          <article class="surface-panel">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Riwayat Void</p>
+                <h4>Daftar transaksi yang dibatalkan</h4>
+              </div>
+            </div>
+            <div class="table-shell">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>No. Transaksi</th>
+                    <th>Tanggal Transaksi</th>
+                    <th>Total</th>
+                    <th>Alasan Void</th>
+                    <th>Dibuat Oleh</th>
+                    <th>Tanggal Void</th>
+                    <th class="align-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="voidTableBody"></tbody>
+              </table>
+            </div>
+          </article>
         </section>
 
         <section class="page" data-view="reports">
@@ -785,6 +1046,11 @@
             </div>
 
             <div class="report-filter-row surface-strip">
+              <button id="reportBackBtn" class="button button-soft hidden" type="button">
+                <span class="material-symbols-outlined">arrow_back</span>
+                Kembali
+              </button>
+
               <label class="select-field">
                 <span>Periode</span>
                 <select id="reportPeriod">
@@ -853,6 +1119,228 @@
             </div>
           </article>
         </section>
+
+        <section class="page" data-view="returns">
+          <div class="page-head">
+            <div>
+              <p class="eyebrow">Retur Penjualan</p>
+              <h3>Retur barang dari transaksi yang sudah selesai.</h3>
+              <p>Pilih transaksi, tentukan barang yang diretur, stok akan dikembalikan otomatis.</p>
+            </div>
+          </div>
+
+          <div class="metric-grid" id="returnAnalyticsGrid">
+            <article class="metric-card metric-card-large">
+              <div class="metric-icon metric-accent">
+                <span class="material-symbols-outlined">assignment_return</span>
+              </div>
+              <div class="metric-copy">
+                <span>Total Retur</span>
+                <strong id="returnTotalCount">0</strong>
+                <small id="returnTotalHint">Riwayat retur penjualan</small>
+              </div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-icon metric-danger">
+                <span class="material-symbols-outlined">money_off</span>
+              </div>
+              <div class="metric-copy">
+                <span>Total Refund</span>
+                <strong id="returnTotalRefund">Rp 0</strong>
+                <small id="returnRefundHint">Total uang dikembalikan ke pelanggan</small>
+              </div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-icon metric-neutral">
+                <span class="material-symbols-outlined">restore</span>
+              </div>
+              <div class="metric-copy">
+                <span>Item Dikembalikan</span>
+                <strong id="returnItemCount">0</strong>
+                <small id="returnItemHint">Total item stok yang diretur</small>
+              </div>
+            </article>
+          </div>
+
+          <div class="toolbar surface-strip">
+            <label class="search-field">
+              <span class="material-symbols-outlined">search</span>
+              <input id="returnSearch" type="text" placeholder="Cari invoice retur, transaksi asal, atau alasan...">
+            </label>
+          </div>
+
+          <article class="surface-panel">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Riwayat Retur</p>
+                <h4>Daftar retur barang</h4>
+              </div>
+            </div>
+            <div class="table-shell">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Invoice Retur</th>
+                    <th>Transaksi Asal</th>
+                    <th>Barang</th>
+                    <th>Alasan</th>
+                    <th>Total Refund</th>
+                    <th>Diproses Oleh</th>
+                    <th class="align-right">Tanggal</th>
+                  </tr>
+                </thead>
+                <tbody id="returnTableBody"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
+        <section class="page" data-view="opnames">
+          <div class="page-head">
+            <div>
+              <p class="eyebrow">Stok Opname</p>
+              <h3>Pencocokan stok fisik dengan stok sistem.</h3>
+              <p>Catat stok fisik barang, sistem akan menghitung selisih dan menyesuaikan stok secara otomatis.</p>
+            </div>
+
+            <button id="openOpnameBtn" class="button button-primary" type="button">
+              <span class="material-symbols-outlined">fact_check</span>
+              Buat Opname Baru
+            </button>
+          </div>
+
+          <div class="metric-grid" id="opnameAnalyticsGrid">
+            <article class="metric-card metric-card-large">
+              <div class="metric-icon metric-primary">
+                <span class="material-symbols-outlined">checklist</span>
+              </div>
+              <div class="metric-copy">
+                <span>Total Opname</span>
+                <strong id="opnameTotalCount">0</strong>
+                <small id="opnameTotalHint">Riwayat stok opname</small>
+              </div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-icon metric-warning">
+                <span class="material-symbols-outlined">compare_arrows</span>
+              </div>
+              <div class="metric-copy">
+                <span>Item dengan Selisih</span>
+                <strong id="opnameDiscrepancyCount">0</strong>
+                <small id="opnameDiscrepancyHint">Item stok tidak sesuai</small>
+              </div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-icon metric-accent">
+                <span class="material-symbols-outlined">swap_vert</span>
+              </div>
+              <div class="metric-copy">
+                <span>Total Penyesuaian</span>
+                <strong id="opnameAdjustmentTotal">Rp 0</strong>
+                <small id="opnameAdjustmentHint">Nilai penyesuaian stok</small>
+              </div>
+            </article>
+          </div>
+
+          <div class="toolbar surface-strip">
+            <label class="search-field">
+              <span class="material-symbols-outlined">search</span>
+              <input id="opnameSearch" type="text" placeholder="Cari nomor opname atau petugas...">
+            </label>
+          </div>
+
+          <article class="surface-panel">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Riwayat Opname</p>
+                <h4>Daftar stok opname</h4>
+              </div>
+            </div>
+            <div class="table-shell">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>No. Opname</th>
+                    <th>Tanggal</th>
+                    <th class="align-right">Total Item</th>
+                    <th class="align-right">Item Selisih</th>
+                    <th class="align-right">Penyesuaian</th>
+                    <th>Status</th>
+                    <th>Dibuat Oleh</th>
+                    <th class="align-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="opnameTableBody"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
+        <!-- Pelanggan Page -->
+        <section class="page" data-view="customers">
+          <div class="page-head">
+            <div>
+              <p class="eyebrow">Manajemen Pelanggan</p>
+              <h3>Daftar pelanggan dan hutang piutang.</h3>
+              <p>Kelola data pelanggan, pantau sisa hutang, dan catat pembayaran cicilan.</p>
+            </div>
+            <button id="addCustomerBtn" class="button button-primary" type="button">
+              <span class="material-symbols-outlined">person_add</span>
+              Tambah Pelanggan
+            </button>
+          </div>
+
+          <div class="metric-grid">
+            <article class="metric-card">
+              <div class="metric-icon metric-primary">
+                <span class="material-symbols-outlined">group</span>
+              </div>
+              <div class="metric-copy">
+                <span>Total Pelanggan</span>
+                <strong id="customerMetricTotal">0</strong>
+                <small id="customerMetricHint">pelanggan terdaftar</small>
+              </div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-icon metric-danger">
+                <span class="material-symbols-outlined">account_balance_wallet</span>
+              </div>
+              <div class="metric-copy">
+                <span>Total Hutang Outstanding</span>
+                <strong id="customerMetricDebt">Rp 0</strong>
+                <small id="customerMetricDebtHint">dari 0 pelanggan</small>
+              </div>
+            </article>
+          </div>
+
+          <article class="surface-panel" style="margin-top:16px">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Daftar Pelanggan</p>
+                <h4>Semua pelanggan terdaftar</h4>
+              </div>
+              <label class="search-field">
+                <span class="material-symbols-outlined">search</span>
+                <input id="customerSearch" type="text" placeholder="Cari nama, HP, alamat...">
+              </label>
+            </div>
+            <div class="table-shell">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Nama</th>
+                    <th>No. HP</th>
+                    <th>Alamat</th>
+                    <th class="align-right">Sisa Hutang</th>
+                    <th class="align-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="customerTableBody"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
       </main>
     </div>
   </div>
@@ -911,6 +1399,12 @@
         <label class="field">
           <span>Harga Jual</span>
           <input id="itemPrice" name="price" type="number" min="0" step="1000" placeholder="0" required>
+        </label>
+
+        <label class="field">
+          <span>Harga Beli</span>
+          <input id="itemPurchasePrice" name="purchasePrice" type="number" min="0" step="1000" placeholder="0">
+          <small style="color:var(--text-tertiary);font-size:0.65rem;">Otomatis dihitung dari rata-rata barang masuk. Bisa diisi manual.</small>
         </label>
 
         <label class="field field-full">
@@ -984,6 +1478,7 @@
               <th>Barang</th>
               <th class="align-right">Jumlah</th>
               <th class="align-right">Harga</th>
+              <th class="align-right">Laba</th>
               <th class="align-right">Subtotal</th>
             </tr>
           </thead>
@@ -992,9 +1487,300 @@
       </div>
 
       <div class="modal-actions">
+        <button id="closeTransactionBtn" class="button button-muted" type="button">
+          <span class="material-symbols-outlined">close</span>
+          Tutup
+        </button>
         <button id="printTransactionModalBtn" class="button button-primary" type="button">
           <span class="material-symbols-outlined">receipt_long</span>
           Cetak Ulang Struk
+        </button>
+        <button id="returnTransactionBtn" class="button button-warning hidden" type="button">
+          <span class="material-symbols-outlined">assignment_return</span>
+          Retur Barang
+        </button>
+        <button id="voidTransactionBtn" class="button button-danger hidden" type="button">
+          <span class="material-symbols-outlined">block</span>
+          Void Transaksi
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="returnModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="returnModalTitle">
+    <div id="returnModalBackdrop" class="modal-backdrop"></div>
+    <div class="modal-card surface-panel return-modal-card">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">Retur Penjualan</p>
+          <h4 id="returnModalTitle">Retur Barang</h4>
+          <small id="returnModalMeta">Pilih barang yang akan diretur</small>
+        </div>
+        <button id="closeReturnModalBtn" class="icon-button" type="button" aria-label="Tutup modal retur">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <div class="return-warning">
+        <span class="material-symbols-outlined">info</span>
+        <div>
+          <strong>Informasi</strong>
+          <p>Stok barang yang diretur akan dikembalikan ke inventaris. Tindakan ini tercatat dalam riwayat retur.</p>
+        </div>
+      </div>
+
+      <div class="return-sale-summary">
+        <div><span>Invoice Asal</span><strong id="returnSaleId">-</strong></div>
+        <div><span>Tanggal</span><strong id="returnSaleDate">-</strong></div>
+        <div><span>Total Transaksi</span><strong id="returnSaleTotal" class="return-total-amount">Rp 0</strong></div>
+      </div>
+
+      <form id="returnForm" class="form-stack">
+        <div id="returnItemsList" class="return-items-list"></div>
+
+        <div class="return-total-box">
+          <span>Total Refund</span>
+          <strong id="returnRefundTotal">Rp 0</strong>
+        </div>
+
+        <label class="field field-full">
+          <span>Alasan Retur <em>(wajib)</em></span>
+          <textarea id="returnReasonInput" name="reason" rows="3" placeholder="Contoh: Barang salah ukuran, pelanggan membatalkan sebagian pesanan..." required></textarea>
+        </label>
+
+        <div class="field-full modal-actions">
+          <button id="cancelReturnBtn" class="button button-muted" type="button">Batal</button>
+          <button id="confirmReturnBtn" class="button button-warning" type="button">
+            <span class="material-symbols-outlined">assignment_return</span>
+            Proses Retur
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="voidModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="voidModalTitle">
+    <div id="voidModalBackdrop" class="modal-backdrop"></div>
+    <div class="modal-card surface-panel void-modal-card">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">Void Transaksi</p>
+          <h4 id="voidModalTitle">Konfirmasi Pembatalan</h4>
+          <small id="voidModalMeta">Melakukan void pada transaksi yang sudah selesai</small>
+        </div>
+        <button id="closeVoidModalBtn" class="icon-button" type="button" aria-label="Tutup modal void">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <div class="void-warning">
+        <span class="material-symbols-outlined">warning</span>
+        <div>
+          <strong>Perhatian!</strong>
+          <p>Stok barang akan dikembalikan secara otomatis. Tindakan ini tercatat dalam audit log dan <strong>tidak dapat dibatalkan</strong>.</p>
+        </div>
+      </div>
+
+      <div class="void-sale-summary">
+        <div><span>Invoice</span><strong id="voidSaleId">-</strong></div>
+        <div><span>Tanggal</span><strong id="voidSaleDate">-</strong></div>
+        <div><span>Total</span><strong id="voidSaleTotal" class="void-total-amount">Rp 0</strong></div>
+        <div><span>Item</span><strong id="voidSaleItems">-</strong></div>
+      </div>
+
+      <form id="voidForm" class="form-stack">
+        <label class="field field-full">
+          <span>Alasan Pembatalan <em>(wajib)</em></span>
+          <textarea id="voidReasonInput" name="reason" rows="3" placeholder="Contoh: Kesalahan input item, pelanggan membatalkan pesanan..." required></textarea>
+        </label>
+
+        <div class="field-full modal-actions">
+          <button id="cancelVoidBtn" class="button button-muted" type="button">Batal</button>
+          <button id="confirmVoidBtn" class="button button-danger" type="button">
+            <span class="material-symbols-outlined">block</span>
+            Konfirmasi Void
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="confirmModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
+    <div id="confirmModalBackdrop" class="modal-backdrop"></div>
+    <div class="modal-card surface-panel confirm-modal-card">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow" id="confirmModalEyebrow">Konfirmasi</p>
+          <h4 id="confirmModalTitle">Hapus Data</h4>
+        </div>
+        <button id="closeConfirmModalBtn" class="icon-button" type="button" aria-label="Tutup">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <div class="confirm-warning">
+        <span class="material-symbols-outlined">warning</span>
+        <div>
+          <strong id="confirmModalWarningTitle">Perhatian!</strong>
+          <p id="confirmModalMessage">Tindakan ini tidak dapat dibatalkan.</p>
+        </div>
+      </div>
+
+      <div class="confirm-item-box" id="confirmItemBox">
+        <span class="material-symbols-outlined">inventory_2</span>
+        <strong id="confirmItemName">-</strong>
+      </div>
+
+      <div class="field-full modal-actions">
+        <button id="cancelConfirmBtn" class="button button-muted" type="button">Batal</button>
+        <button id="confirmDeleteBtn" class="button button-danger" type="button">
+          <span class="material-symbols-outlined">delete</span>
+          Hapus
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Customer Modal (Tambah / Edit) -->
+  <div id="customerModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="customerModalTitle">
+    <div id="customerModalBackdrop" class="modal-backdrop"></div>
+    <div class="modal-card surface-panel">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">Data Pelanggan</p>
+          <h4 id="customerModalTitle">Tambah Pelanggan</h4>
+        </div>
+        <button id="closeCustomerModalBtn" class="icon-button" type="button" aria-label="Tutup">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <form id="customerForm" class="form-grid">
+        <input id="customerFormId" type="hidden">
+        <label class="field field-full">
+          <span>Nama Pelanggan <em style="color:var(--danger,#ef4444)">*</em></span>
+          <input id="customerFormName" type="text" placeholder="Contoh: Budi Santoso" required>
+        </label>
+        <label class="field field-full">
+          <span>Nomor HP</span>
+          <input id="customerFormPhone" type="tel" placeholder="08xxxxxxxxxx">
+        </label>
+        <label class="field field-full">
+          <span>Alamat</span>
+          <textarea id="customerFormAddress" rows="2" placeholder="Alamat lengkap..."></textarea>
+        </label>
+        <label class="field field-full">
+          <span>Catatan</span>
+          <textarea id="customerFormNotes" rows="2" placeholder="Catatan internal..."></textarea>
+        </label>
+        <div class="field-full modal-actions">
+          <button id="cancelCustomerModalBtn" class="button button-muted" type="button">Batal</button>
+          <button class="button button-primary" type="submit">
+            <span class="material-symbols-outlined">save</span>
+            Simpan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Customer Detail Modal (Hutang) -->
+  <div id="customerDetailModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="customerDetailTitle">
+    <div id="customerDetailBackdrop" class="modal-backdrop"></div>
+    <div class="modal-card surface-panel customer-detail-card">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">Detail Pelanggan</p>
+          <h4 id="customerDetailTitle">-</h4>
+          <small id="customerDetailMeta">-</small>
+        </div>
+        <button id="closeCustomerDetailBtn" class="icon-button" type="button" aria-label="Tutup">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <div id="customerDetailInfo" class="customer-detail-info"></div>
+
+      <div class="panel-head" style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+        <div>
+          <p class="eyebrow">Daftar Hutang</p>
+          <h4>Transaksi belum lunas</h4>
+        </div>
+        <strong id="customerDetailTotalDebt" class="debt-badge">Rp 0</strong>
+      </div>
+      <div id="customerDebtList" class="customer-debt-list"></div>
+    </div>
+  </div>
+
+  <div id="opnameModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="opnameModalTitle">
+    <div id="opnameModalBackdrop" class="modal-backdrop"></div>
+    <div class="modal-card surface-panel opname-modal-card">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">Stok Opname</p>
+          <h4 id="opnameModalTitle">Buat Opname Baru</h4>
+          <small id="opnameModalMeta">Masukkan stok fisik sesuai hasil counting</small>
+        </div>
+        <button id="closeOpnameModalBtn" class="icon-button" type="button" aria-label="Tutup modal opname">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <div class="opname-warning">
+        <span class="material-symbols-outlined">info</span>
+        <div>
+          <strong>Informasi</strong>
+          <p>Stok barang akan disesuaikan dengan stok fisik yang dimasukkan. Item dengan selisih akan tercatat dalam riwayat opname.</p>
+        </div>
+      </div>
+
+      <div class="opname-toolbar">
+        <label class="search-field">
+          <span class="material-symbols-outlined">search</span>
+          <input id="opnameModalSearch" type="text" placeholder="Cari nama barang atau SKU...">
+        </label>
+        <label class="select-field">
+          <span>Kategori</span>
+          <select id="opnameCategoryFilter"></select>
+        </label>
+      </div>
+
+      <div class="opname-catalog-shell">
+        <table class="data-table opname-table">
+          <thead>
+            <tr>
+              <th class="align-right">No</th>
+              <th>Nama Barang</th>
+              <th>SKU</th>
+              <th class="align-right">Stok Sistem</th>
+              <th class="align-right">Stok Fisik</th>
+              <th class="align-right">Selisih</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="opnameModalBody"></tbody>
+        </table>
+      </div>
+
+      <div class="opname-summary-bar" id="opnameSummaryBar">
+        <span>Total Item: <strong id="opnameSummaryTotal">0</strong></span>
+        <span class="opname-summary-sep">|</span>
+        <span>Sesuai: <strong id="opnameSummaryMatched" class="opname-status-matched">0</strong></span>
+        <span class="opname-summary-sep">|</span>
+        <span>Selisih: <strong id="opnameSummaryDiscrepancy" class="opname-status-shortage">0</strong></span>
+        <span class="opname-summary-sep">|</span>
+        <span>Penyesuaian: <strong id="opnameSummaryAdjustment">Rp 0</strong></span>
+      </div>
+
+      <label class="field opname-notes-field">
+        <span>Catatan <em>(opsional)</em></span>
+        <textarea id="opnameNotesInput" name="notes" rows="2" placeholder="Contoh: Opname akhir bulan Juni 2026"></textarea>
+      </label>
+
+      <div class="field-full modal-actions">
+        <button id="cancelOpnameBtn" class="button button-muted" type="button">Batal</button>
+        <button id="confirmOpnameBtn" class="button button-primary" type="button">
+          <span class="material-symbols-outlined">fact_check</span>
+          Proses Opname
         </button>
       </div>
     </div>
