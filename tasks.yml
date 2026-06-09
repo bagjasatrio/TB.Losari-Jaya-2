@@ -1,0 +1,33 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: cleanup
+spec:
+  description: Task untuk membersihkan workspace setelah pipeline selesai
+  workspaces:
+    - name: source
+  steps:
+    - name: clean-workspace
+      image: alpine:latest
+      script: |
+        echo "Memulai pembersihan workspace..."
+        rm -rf $(workspaces.source.path)/*
+        echo "Workspace berhasil dibersihkan."
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: jest-test
+spec:
+  description: Task untuk menjalankan unit testing menggunakan Jest
+  workspaces:
+    - name: source
+  steps:
+    - name: run-tests
+      image: node:20-alpine
+      workingDir: $(workspaces.source.path)
+      script: |
+        echo "Menginstall dependencies..."
+        npm ci
+        echo "Menjalankan unit testing dengan Jest..."
+        npm test -- --watchAll=false
